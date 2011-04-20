@@ -1,0 +1,66 @@
+@CHARSET "UTF-8";
+
+@def gameWidth 450px;
+@def gameHeight 450px;
+	
+A:link {text-decoration: underline; color:#999999; }
+A:visited {text-decoration: underline; color: #999999; }
+A:active {text-decoration: underline; color: #b8fcff; }
+A:hover {text-decoration: underline; color:#b8fcff; }
+
+body {
+   background-color:#024001;
+   margin: 0px;
+   padding: 0px;
+}
+
+.wrapper {
+    position: relative;
+    border: 3px  solid;	
+    top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+   margin: 0 auto;
+   text-align:center;
+   width: gameWidth;
+   height: gameHeight;
+   background-color:#777777;
+}
+
+
+.gameWindow {
+	position: absolute;
+	background-color: #ffffff;
+	margin: auto auto;
+	top: 4px;
+	border: 2px solid #000000;
+	border-collapse:collapse;
+	height:89%;
+	width: 96%;
+	
+}
+
+.playButton {
+	/*position: absolute;
+	/*width: 45px; */
+	/*height: 17px; */
+	/*left: 17px;*/
+	margin: 0 0 0 15px;
+	
+}
+
+.stopButton {
+	/*position: absolute;
+	left: 75px;*/
+	margin: 0 0 0 8px;
+	
+}
+
+.speedListBox {
+	/*position: relative;*/
+	width: 85px;
+	margin: 0 0 0 19px;
+	/*left: 140px*/
+}
+
+

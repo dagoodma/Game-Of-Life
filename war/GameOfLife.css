@@ -1,0 +1,40 @@
+/** Add css rules here for your application. */
+
+A:link {text-decoration: underline; color:#999999; }
+A:visited {text-decoration: underline; color: #999999; }
+A:active {text-decoration: underline; color: #b8fcff; }
+A:hover {text-decoration: underline; color:#b8fcff; }
+
+/** Example rules used by the template application (remove for your app) */
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+  color: #BCBCBC;
+  margin: 0px 0px 0px;
+  text-align: center;
+}
+
+h2 {
+	font-size: 1em;
+	color: #999999;
+	text-align: center;
+	margin: 0px 10px;
+}
+
+.author {
+	font-size: 1em;
+	color:#777777;
+	margin: 15px 30px -20px;
+	text-align: right;
+}
+
+.dialogVPanel {
+  margin: 5px;
+}
+
+.error {
+  color: red;
+}
+
+/** Set ids using widget.getElement().setId("idOfElement") */
+

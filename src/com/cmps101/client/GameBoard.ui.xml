@@ -1,0 +1,26 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+    xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+
+    <ui:with field='res' type='com.cmps101.client.GameResources'/>
+
+    <g:VerticalPanel ui:field="content" styleName='{res.css.wrapper}'>
+    		<g:Cell>
+    			<g:AbsolutePanel ui:field="gameWindow" styleName="{res.css.gameWindow}">
+    			</g:AbsolutePanel>
+    		</g:Cell>
+    		<g:Cell >
+    		<g:HorizontalPanel>
+    		<g:Cell >
+    				<g:Button text="Play" ui:field="playButton" styleName="{res.css.playButton}" />
+    		</g:Cell>
+    		<g:Cell >
+    				<g:Button text="Stop" ui:field="stopButton" styleName="{res.css.stopButton}" />
+    		</g:Cell>
+    		<g:Cell >
+    				<g:ListBox ui:field="speedListBox" styleName="{res.css.speedListBox}"/>
+    		</g:Cell>
+    		</g:HorizontalPanel>
+    		</g:Cell>
+    </g:VerticalPanel>
+</ui:UiBinder>         
