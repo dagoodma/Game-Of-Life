@@ -20,6 +20,7 @@ import com.google.gwt.widgetideas.graphics.client.GWTCanvas;
 import com.google.gwt.widgetideas.graphics.client.Color;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -65,16 +66,21 @@ public class GameBoard extends Composite {
 	    
 	    GWT.log("Board initialized: " + width + "x" + height);
 	    
-	    // Initialize the buttons
+	    // Initialize the interface
 	    stopButton.setTitle("Press once to pause the game.\n" +
 	    					"Press twice to reset the game.");
-	    /*
-	    playButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				Window.alert("HEY!");
-			}
-		});
-		*/
+	    
+	    
+	    // Speed select
+	    int i = 0; 
+	    for (Speed s : Speed.values()) {
+	    	speedListBox.addItem(s.toString(), "" + s);
+	    	if (game.getPace() == s) {
+	    		speedListBox.setItemSelected(i, true);
+	    	}
+	    	i++;
+	    }
+	    
 	}	
 	
 	/**
@@ -316,10 +322,14 @@ public class GameBoard extends Composite {
 	}
 	
 	public void updateStopButton() {
-		if (game.wasStopped())
+		if (game.wasStopped() && game.getTurns() > 0)
 			stopButton.setText("Reset");
 		else
 			stopButton.setText("Stop");
+	}
+	
+	public void setGameSpeed(String speed) {
+		game.setPace(speed);
 	}
 	
 	@UiHandler("playButton")
@@ -334,6 +344,12 @@ public class GameBoard extends Composite {
 		game.toggleStop();
 		updatePlayButton();
 		updateStopButton();
+	}
+	
+	@UiHandler("speedListBox")
+	void doChange(ChangeEvent event) {
+		String newSpeed = speedListBox.getValue(speedListBox.getSelectedIndex());
+		setGameSpeed(newSpeed);
 	}
 
 }

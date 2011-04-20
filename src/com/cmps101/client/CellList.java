@@ -23,6 +23,8 @@ public class CellList extends LinkedList<Cell> {
 	}
 	
 	public boolean add(Cell cell) {
+		super.add(cell);
+		/*
 		if (size() == 0) {
 			super.add(cell);
 			return true;
@@ -37,10 +39,12 @@ public class CellList extends LinkedList<Cell> {
 			else if (i == 0)
 				super.add(0, cell);
 		} // end of l
+		*/
 		return true;
 	}
 	
 	public void update() {
+		Collections.sort(this);
 		
 		// Count neighbors for each
 		for(int i = 1; i < size() ; i++) {
@@ -60,8 +64,16 @@ public class CellList extends LinkedList<Cell> {
 				if (first.isAlive() && !next.isAlive()) {
 					next.getParent().incrementNeighbors();
 				}
-				// Alive overlaps an alive...
-				remove(i--); // discard duplicate
+				// Dead overlapping an alive
+				/*
+				if (!first.isAlive() && next.isAlive()) {
+					remove(--i);
+				}
+				else {
+				*/
+					// Alive overlaps an alive...
+					// discard duplicate
+					remove(i--); 
 			}
 		}
 		

@@ -3,13 +3,11 @@ package com.cmps101.client;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
-
 import com.cmps101.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -28,6 +26,8 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+
+
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -36,6 +36,8 @@ public class GameOfLife implements EntryPoint {
 	private boolean wasStopped = false;
 	private int totalTurns = 19;
 	private int turn = 0;
+	private Speed paceOfLife = Speed.NORMAL;
+	private int gameSpeed = paceOfLife.value();
 	private GameBoard gameBoard;
 	private CellList creatures = new CellList();
 	
@@ -100,7 +102,7 @@ public class GameOfLife implements EntryPoint {
 	public void play() {
 		isPlaying = true;
 		
-		Scheduler.get().scheduleFixedPeriod(new RepeatingCommand() {
+		Scheduler.get().scheduleFixedDelay(new RepeatingCommand() {
 			@Override
 			public boolean execute() {
 				if (! isPlaying || ! nextTurn()) {
@@ -110,7 +112,7 @@ public class GameOfLife implements EntryPoint {
 				gameBoard.update();
 				return true;
 			}
-		}, 250);
+		}, gameSpeed);
 	}
 	
 	public void pause() {
@@ -123,7 +125,9 @@ public class GameOfLife implements EntryPoint {
 			wasStopped = true;
 		}
 		else if (wasStopped) {
+			// Reset
 			initialize(); // resets board
+			turn = 0;
 			wasStopped = false;
 		}
 		else if (!isPlaying) {
@@ -144,6 +148,11 @@ public class GameOfLife implements EntryPoint {
 		// add function via. the CellList instead of iter
 		// and avoid a concurrent modification exception
 		CellList passList = creatures.clone();
+		/*
+		CellList topList = new CellList();
+		CellList midList = new CellList();
+		CellList bottomList = new CellList();
+		*/
 		
 		ListIterator<Cell> iter = passList.listIterator();
 		int i = 0;
@@ -185,6 +194,42 @@ public class GameOfLife implements EntryPoint {
 	
 	public boolean isPlaying() {
 		return isPlaying;
+	}
+	
+	public Speed getPace() {
+		return paceOfLife;
+	}
+	
+	public boolean setPace(String pace) {
+		Speed speed = null;
+		for (Speed s : Speed.values()) {
+			if (s.toString().equals(pace)) {
+				speed = s;
+				break;
+			}
+		}
+		if (speed == null)
+			return false;
+		
+		paceOfLife = speed;
+		gameSpeed = speed.value();
+		
+		// Pause and start the game again
+		if (isPlaying) {
+			pause();
+			Scheduler.get().scheduleFixedDelay(new RepeatingCommand() {
+				@Override
+				public boolean execute() {
+					play();
+					return false;
+				}
+			}, gameSpeed);
+		}
+		return true;
+	}
+	
+	public int getTurns() {
+		return turn;
 	}
 	
 	public boolean wasStopped() {
