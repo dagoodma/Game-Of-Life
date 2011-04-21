@@ -15,7 +15,7 @@
     				<g:Button text="Play" ui:field="playButton" styleName="{res.css.playButton}" />
     		</g:Cell>
     		<g:Cell >
-    				<g:Button text="Stop" ui:field="stopButton" styleName="{res.css.stopButton}" />
+    				<g:Button text="Reset" ui:field="stopButton" styleName="{res.css.stopButton}" />
     		</g:Cell>
     		<g:Cell >
     				<g:ListBox ui:field="speedListBox" styleName="{res.css.speedListBox}"/>

@@ -33,7 +33,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  */
 public class GameOfLife implements EntryPoint {
 	private boolean isPlaying = false;
-	private boolean wasStopped = false;
+	private boolean wasReset = false;
 	private int totalTurns = 19;
 	private int turn = 0;
 	private Speed paceOfLife = Speed.NORMAL;
@@ -65,30 +65,35 @@ public class GameOfLife implements EntryPoint {
 		creatures.add(new Cell(52,49,true));
 		creatures.add(new Cell(51,48,true));
 		*/
-		/* Exploder */
+		/* Exploder 
 	    
-		creatures.add(new Cell(50,49,true));
-		creatures.add(new Cell(49,50,true));
-		creatures.add(new Cell(50,50,true));
-		creatures.add(new Cell(51,50,true));
-		creatures.add(new Cell(49,51,true));
-		creatures.add(new Cell(50,52,true));
-		creatures.add(new Cell(51,51,true));
-		
-		/* Glider
-		creatures.add(new Cell(50,48,true));
-		creatures.add(new Cell(48,49,true));
-		creatures.add(new Cell(50,49,true));
-		creatures.add(new Cell(49,50,true));
-		creatures.add(new Cell(50,50,true));
+		creatures.add(new Cell(20,19,true));
+		creatures.add(new Cell(20,20,true));
+		creatures.add(new Cell(21,20,true));
+		creatures.add(new Cell(19,21,true));
+		creatures.add(new Cell(21,21,true));
+		creatures.add(new Cell(20,22,true));
 		*/
+		
+		/* Glider */
+		creatures.add(new Cell(20,18,true));
+		creatures.add(new Cell(18,19,true));
+		creatures.add(new Cell(20,19,true));
+		creatures.add(new Cell(19,20,true));
+		creatures.add(new Cell(20,20,true));
+		
 		
 		// draw the initial state
 		gameBoard.update();
 	}
 	
+	/**
+	 * Either starts the game or stops it depending on its current
+	 * state.
+	 * @return whether the game was started or not
+	 */
 	public boolean togglePlay() {
-		wasStopped = false; // reset stop clear
+		wasReset = false; // reset stop clear
 		if (!isPlaying) {
 			play();
 			return true;
@@ -99,6 +104,9 @@ public class GameOfLife implements EntryPoint {
 		}
 	}
 	
+	/**
+	 * Starts the game.
+	 */
 	public void play() {
 		isPlaying = true;
 		
@@ -115,26 +123,33 @@ public class GameOfLife implements EntryPoint {
 		}, gameSpeed);
 	}
 	
+	/**
+	 * Pauses the game.
+	 */
 	public void pause() {
 		isPlaying = false;
 	}
 	
-	public boolean toggleStop() {
-		if (isPlaying) {
-			pause();
-			wasStopped = true;
-		}
-		else if (wasStopped) {
+	/**
+	 * Either stops the game or resets it depending on its current state.
+	 * @return the wasStopped flag.
+	 */
+	public boolean toggleReset() {
+		if (!wasReset) {
 			// Reset
+			if (isPlaying())
+				pause();
 			initialize(); // resets board
 			turn = 0;
-			wasStopped = false;
+			wasReset = true;
 		}
-		else if (!isPlaying) {
-			wasStopped = true;
+		else  {
+			// Clear the board
+			gameBoard.reset(); // clears the board
+			wasReset = false;
 		}
 		
-		return wasStopped;
+		return wasReset;
 	}
 	
 	/**
@@ -176,7 +191,7 @@ public class GameOfLife implements EntryPoint {
 							&& neighbor.getY() == cell.getY()) {
 						continue;
 					}
-					creatures.add(neighbor);
+					creatures.add(neighbor); // throw them in unsorted
 				} // end of k
 			} // end of j
 			i++;
@@ -232,7 +247,7 @@ public class GameOfLife implements EntryPoint {
 		return turn;
 	}
 	
-	public boolean wasStopped() {
-		return wasStopped;
+	public boolean wasReset() {
+		return wasReset;
 	}
 }

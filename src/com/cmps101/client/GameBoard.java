@@ -7,6 +7,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
@@ -23,9 +24,13 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.shared.EventHandler;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 
-public class GameBoard extends Composite {
+public class GameBoard extends Composite implements HasClickHandlers {
 	@UiTemplate("GameBoard.ui.xml")
 	interface GameUi extends UiBinder<Widget, GameBoard> {}
 	private static GameUi uiBinder = GWT.create(GameUi.class);
@@ -40,10 +45,12 @@ public class GameBoard extends Composite {
 	
 	private GameOfLife game;
 	private GWTCanvas canvas;
+	private HandlerRegistration registration = null;
 	private CellList creatures; // creatures drawn
 	private int height, width; // board dim. in px
+	private final int clickOffset = -1; // border width
 	private int total, rows, columns; // cell count
-	private final int cellSize = 5; // 10x10
+	private final int cellSize = 10; // 10x10
 	private final int widthOffset = 24;
 	private final int heightOffset = 59;
 	
@@ -61,15 +68,13 @@ public class GameBoard extends Composite {
 		initialize();
 		canvas =  new GWTCanvas(width,height);
 		drawGrid();
-		
+		creatures = game.getCreatures();
+		update();
+	
 	    gameWindow.add(canvas);
-	    
-	    GWT.log("Board initialized: " + width + "x" + height);
-	    
 	    // Initialize the interface
-	    stopButton.setTitle("Press once to pause the game.\n" +
-	    					"Press twice to reset the game.");
-	    
+	    stopButton.setTitle("Press once to reset the board.\n" +
+	    					"Press twice to clear the board.");
 	    
 	    // Speed select
 	    int i = 0; 
@@ -82,6 +87,11 @@ public class GameBoard extends Composite {
 	    }
 	    
 	}	
+	
+	public HandlerRegistration addClickHandler (
+			final ClickHandler handler) {
+		return addHandler(handler, ClickEvent.getType());
+	}
 	
 	/**
 	 * Initializes the boards height and width and clips rest.
@@ -99,6 +109,8 @@ public class GameBoard extends Composite {
 		rows = width / cellSize;
 		columns = height / cellSize;
 		total = rows * columns;
+		
+		GWT.log("Board initialized: " + width + "x" + height);
 	}
 	
 	/**
@@ -115,8 +127,8 @@ public class GameBoard extends Composite {
 	 * @param cell where the grid will be drawn.
 	 */
 	public void drawGrid(Cell cell) {
-		int cellStartX = cellStart(cell.getX());
-		int cellStartY = cellStart(cell.getY());
+		int cellStartX = getCellCoordinate(cell.getX());
+		int cellStartY = getCellCoordinate(cell.getY());
 		int cellEndX = cellStartX + cellSize;
 		int cellEndY = cellStartY + cellSize;
 		drawGrid(cellStartX, cellStartY, cellEndX, cellEndY);
@@ -167,9 +179,8 @@ public class GameBoard extends Composite {
 		//			 "\nFrom: " + rowsToDraw + "," + colsToDraw + " vs. " + rows + "," + columns);
 		
 		// Finally, draw the grid
-		//canvas.setLineCap(GWTCanvas.SQUARE);
-		//canvas.setMiterLimit(100);
-		canvas.setLineWidth(gridThickness);
+		canvas.setLineWidth(0.3);
+		canvas.setLineCap(GWTCanvas.SQUARE);
 		canvas.setStrokeStyle(gridColor);
 		canvas.beginPath();
 		// Columns
@@ -186,6 +197,15 @@ public class GameBoard extends Composite {
 	    canvas.stroke();
 	}
 	
+	public void patchCellGrid(Cell cell) {
+		int x = cell.getX();
+		int y= cell.getY();
+		canvas.setGlobalAlpha(0.6);
+		canvas.setStrokeStyle(gridColor);
+		canvas.strokeRect(getCellCoordinate(x) + 0.5, getCellCoordinate(y) + 0.5, cellSize - 1,  cellSize - 1 );
+		canvas.setGlobalAlpha(1);	
+	}
+	
 	/**
 	 * Updates the cells on the board by clearing the old and
 	 * drawing the new cells.
@@ -193,11 +213,14 @@ public class GameBoard extends Composite {
 @note Clearing every time may be inefficient.
 	 */
 	public void update() {
+		clear();
+		/*
 		if (creatures != null) {
 			clear(); // Clear the old creatures
 		}
+		*/
 		
-		creatures = game.getCreatures().clone();
+		//creatures = game.getCreatures();
 		//GWT.log("Updating creatures: " + creatures.toString());
 
 		for (Object obj : creatures) {
@@ -210,19 +233,19 @@ public class GameBoard extends Composite {
 	/**
 	 * Erases all of the creatures on the board.
 	 */
+	public void reset() {
+		if (creatures != null)
+			creatures.clear();
+		clear();
+	}
+	
+	/**
+	 * Erases the board.
+	 */
 	public void clear() {
-		if (creatures == null) return;
-		//GWT.log("Clearing " + creatures.size() + " creatures.");
-		/*
-		for (Object obj : creatures) {
-			Cell cell = (Cell)obj;
-			clearCell(cell);
-		}
-		*/
 		canvas.clear();
-		creatures.clear();
+		//Window.alert("here!");
 		drawGrid();
-		//Window.alert("Cleared!");
 	}
 
 	/**
@@ -239,8 +262,9 @@ public class GameBoard extends Composite {
 			return false;
 		}
 		
+		
 		canvas.setFillStyle(Color.BLACK);
-		canvas.fillRect(cellStart(x), cellStart(y), cellSize, cellSize);
+		canvas.fillRect(getCellCoordinate(x), getCellCoordinate(y), cellSize, cellSize);
 		return true;
 	}
 	
@@ -260,17 +284,58 @@ public class GameBoard extends Composite {
 			//GWT.log("Could not clear index: " + x + "," + y);
 			return false;
 		}
-		
+
 		// Fill with white
+		canvas.setGlobalCompositeOperation(GWTCanvas.SOURCE_OVER);
 		canvas.setFillStyle(Color.WHITE);
-		canvas.fillRect(cellStart(x) - 1, cellStart(y) - 1, cellSize + 1, cellSize + 1);
-		
+		canvas.fillRect(getCellCoordinate(x), getCellCoordinate(y), cellSize, cellSize);
+		patchCellGrid(cell);
+		//canvas.setGlobalCompositeOperation(GWTCanvas.DESTINATION_OVER);
+		//drawGrid(cell);
+			
 		// Fix the grid
-		//Window.alert("Gridding: " + cellStart(x) + "," + cellStart(y));
-		drawGrid(cellStart(x), cellStart(y), cellStart(x) + cellSize, cellStart(y) + cellSize);
+		//Window.alert("Gridding: " + getCellCoordinate(x) + "," + getCellCoordinate(y));
+		//drawGrid(getCellCoordinate(x), getCellCoordinate(y), getCellCoordinate(x) + cellSize, getCellCoordinate(y) + cellSize);
 		
 		return true;
 	}
+	
+	@Override
+	protected void onLoad() {
+		super.onLoad();
+		this.registration = addDomHandler(new ClickHandler() {
+			public void onClick(final ClickEvent event) {
+				if (isCanvasClick(event)) {
+					// Pause the game
+					
+					int clickX = event.getRelativeX(canvas.getElement());
+					int clickY = event.getRelativeY(canvas.getElement());
+					int cellX = getCellIndex(clickX);
+					int cellY = getCellIndex(clickY);
+					Cell cell = creatures.getCellAt(cellX, cellY);
+					// Draw or clear
+					if (cell == null) {
+						// Add new creature
+						creatures.addToOrder(new Cell(cellX, cellY, true));
+						fillCell(cellX, cellY);
+					}
+					else {
+						clearCell(cell);
+						creatures.remove(cell);
+					}
+					
+				}
+			}
+		}, ClickEvent.getType());
+	}
+	
+	@Override
+	protected void onUnload() {
+		super.onUnload();
+		registration.removeHandler();
+		registration = null;
+	}
+
 	
 	/**
 	 * Check if the given cell is at a displayable position on 
@@ -305,13 +370,24 @@ public class GameBoard extends Composite {
 		return ! (x > width || y > height || x < 0 || y < 0);
 	}
 	
+	public boolean isCanvasClick(ClickEvent click) {
+		int clickX = click.getRelativeX(canvas.getElement());
+		int clickY = click.getRelativeY(canvas.getElement());
+		//clickX += clickOffset;
+		//clickY += clickOffset;
+		//Window.alert(clickX + "," + clickY + " vs. " + width + "x" + height + (clickX >= 0 && clickY >= 0 && clickX <= width && clickY <= height));
+		return (clickX >= 0 && clickY >= 0 && clickX <= width && clickY <= height);
+	}
+	
 	/**
 	 * Convert a cell index to a pixel location.
 	 * 
 	 * @param n Cell index can be either a row or a column index.
 	 * @return Starting pixel of the given index.
 	 */
-	public int cellStart(int n) { return cellSize * n; }
+	public int getCellCoordinate(int n) { return cellSize * n; }
+	
+	public int getCellIndex(int x) { return x / cellSize; } // round down
 	
 	public void updatePlayButton() {
 		
@@ -321,11 +397,11 @@ public class GameBoard extends Composite {
 			playButton.setText("Pause");
 	}
 	
-	public void updateStopButton() {
-		if (game.wasStopped() && game.getTurns() > 0)
+	public void updateResetButton() {
+		if (!game.wasReset())
 			stopButton.setText("Reset");
 		else
-			stopButton.setText("Stop");
+			stopButton.setText("Clear");
 	}
 	
 	public void setGameSpeed(String speed) {
@@ -336,14 +412,14 @@ public class GameBoard extends Composite {
 	void doPlay(ClickEvent event) {
 		game.togglePlay();
 		updatePlayButton();
-		updateStopButton();
+		updateResetButton();
 	}
 	
 	@UiHandler("stopButton")
 	void doStop(ClickEvent event) {
-		game.toggleStop();
+		game.toggleReset();
 		updatePlayButton();
-		updateStopButton();
+		updateResetButton();
 	}
 	
 	@UiHandler("speedListBox")
@@ -351,5 +427,6 @@ public class GameBoard extends Composite {
 		String newSpeed = speedListBox.getValue(speedListBox.getSelectedIndex());
 		setGameSpeed(newSpeed);
 	}
+	
 
 }

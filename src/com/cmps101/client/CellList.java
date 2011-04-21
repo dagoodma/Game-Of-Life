@@ -43,8 +43,28 @@ public class CellList extends LinkedList<Cell> {
 		return true;
 	}
 	
-	public void update() {
+	public void addToOrder(Cell cell) {
+		if (size() == 0) {
+			super.add(cell);
+		}
+		// Find where to add the creature
+		for (int i = size() - 1; i >= 0; i--) {
+			if ( cell.compareTo(get(i)) >= 0 ) {
+				super.add(i + 1, cell);
+				//GWT.log(this.toString());
+				break;
+			}
+			else if (i == 0)
+				super.add(0, cell);
+		} // end of l
+	}
+	
+	public void sort() {
 		Collections.sort(this);
+	}
+	
+	public void update() {
+		sort();
 		
 		// Count neighbors for each
 		for(int i = 1; i < size() ; i++) {
@@ -86,6 +106,26 @@ public class CellList extends LinkedList<Cell> {
 				remove(i--);
 			}
 		}
+	}
+	
+	public boolean remove(Cell cell) {
+		int i = 0;
+		for (Cell cell_i : this) {
+			if (cell_i.getX() == cell.getX() && cell_i.getY() == cell.getY()) {
+				remove(i);
+				return true;
+			}
+			i++;
+		}
+		return false;
+	}
+	
+	public Cell getCellAt(int i, int j) {
+		for (Cell cell : this) {
+			if (cell.getX() == i && cell.getY() == j)
+				return cell;
+		}
+		return null;
 	}
 	
 	public CellList clone() {
