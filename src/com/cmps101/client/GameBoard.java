@@ -1,8 +1,7 @@
 package com.cmps101.client;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 
+import java.util.ArrayList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -25,12 +24,23 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.HasMouseDownHandlers;
+import com.google.gwt.event.dom.client.HasMouseMoveHandlers;
+import com.google.gwt.event.dom.client.HasMouseUpHandlers;
 import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseEvent;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 
-public class GameBoard extends Composite implements HasClickHandlers {
+public class GameBoard extends Composite
+	implements HasMouseDownHandlers, HasMouseUpHandlers,
+			   HasMouseMoveHandlers {
 	@UiTemplate("GameBoard.ui.xml")
 	interface GameUi extends UiBinder<Widget, GameBoard> {}
 	private static GameUi uiBinder = GWT.create(GameUi.class);
@@ -45,7 +55,8 @@ public class GameBoard extends Composite implements HasClickHandlers {
 	
 	private GameOfLife game;
 	private GWTCanvas canvas;
-	private HandlerRegistration registration = null;
+	private ArrayList<HandlerRegistration> registrations
+		= new ArrayList<HandlerRegistration>();
 	private CellList creatures; // creatures drawn
 	private int height, width; // board dim. in px
 	private final int clickOffset = -1; // border width
@@ -58,6 +69,12 @@ public class GameBoard extends Composite implements HasClickHandlers {
 	private boolean showGrid = true;
 	private Color gridColor = new Color("#000000");
 	private double gridThickness = 0.5;
+	
+	// Mouse related variables
+	private boolean mouseDown = false, mouseDraw = true,
+		mouseDownPause = false;
+	private Cell lastModified = null;
+	
 	
 	public GameBoard(GameOfLife game) {
 		GameResources.INSTANCE.css().ensureInjected();
@@ -88,10 +105,25 @@ public class GameBoard extends Composite implements HasClickHandlers {
 	    
 	}	
 	
+	public HandlerRegistration addMouseDownHandler(
+		final MouseDownHandler handler) {
+			return addHandler(handler, MouseDownEvent.getType());
+	}
+	public HandlerRegistration addMouseUpHandler(
+		final MouseUpHandler handler) {
+			return addHandler(handler, MouseUpEvent.getType());
+	}
+	public HandlerRegistration addMouseMoveHandler(
+		final MouseMoveHandler handler) {
+			return addHandler(handler, MouseMoveEvent.getType());
+	}	
+	
+	/*
 	public HandlerRegistration addClickHandler (
 			final ClickHandler handler) {
 		return addHandler(handler, ClickEvent.getType());
 	}
+	*/
 	
 	/**
 	 * Initializes the boards height and width and clips rest.
@@ -200,6 +232,7 @@ public class GameBoard extends Composite implements HasClickHandlers {
 	public void patchCellGrid(Cell cell) {
 		int x = cell.getX();
 		int y= cell.getY();
+		// How I figured this out I have no idea
 		canvas.setGlobalAlpha(0.6);
 		canvas.setStrokeStyle(gridColor);
 		canvas.strokeRect(getCellCoordinate(x) + 0.5, getCellCoordinate(y) + 0.5, cellSize - 1,  cellSize - 1 );
@@ -214,17 +247,13 @@ public class GameBoard extends Composite implements HasClickHandlers {
 	 */
 	public void update() {
 		clear();
+		creatures = game.getCreatures();
 		/*
 		if (creatures != null) {
 			clear(); // Clear the old creatures
 		}
 		*/
-		
-		//creatures = game.getCreatures();
-		//GWT.log("Updating creatures: " + creatures.toString());
-
-		for (Object obj : creatures) {
-			Cell cell = (Cell)obj;
+		for (Cell cell : creatures) {
 			if (cell.isAlive())
 				fillCell(cell.getX(), cell.getY());
 		}
@@ -303,6 +332,78 @@ public class GameBoard extends Composite implements HasClickHandlers {
 	@Override
 	protected void onLoad() {
 		super.onLoad();
+		registrations.add(addDomHandler(new MouseDownHandler() {
+			public void onMouseDown(final MouseDownEvent event) {
+				if (isCanvasClick(event)) {
+					int clickX = event.getRelativeX(canvas.getElement());
+					int clickY = event.getRelativeY(canvas.getElement());
+					int cellX = getCellIndex(clickX);
+					int cellY = getCellIndex(clickY);
+					Cell cell = creatures.getCellAt(cellX, cellY);
+					mouseDown = true;
+					if (game.isPlaying()) {
+						game.pause();
+						mouseDownPause = true;
+					}
+
+					if (cell != null) {
+						mouseDraw = false; //erase
+						eraseCell(cell);
+					}
+					else {
+						mouseDraw = true; // draw
+						drawCell(new Cell(cellX, cellY, true));
+					}
+				} // end of isCanvasClick()
+			} // end of onMouseDown()
+		}, MouseDownEvent.getType())
+		);
+		registrations.add(addDomHandler(new MouseUpHandler() {
+			public void onMouseUp(final MouseUpEvent event) {
+				if (mouseDown) {
+					mouseDown = false;
+					if (mouseDownPause) {
+						game.play();
+						mouseDownPause = false;
+					}
+					lastModified = null;
+					
+				} // end of isCanvasClick()
+			} // end of onMouseDown()
+		}, MouseUpEvent.getType())
+		);
+		
+		registrations.add(addDomHandler(new MouseMoveHandler() {
+			public void onMouseMove(final MouseMoveEvent event) {
+				if (mouseDown) {
+					if (!isCanvasClick(event)) {
+						return;
+					}
+					int clickX = event.getRelativeX(canvas.getElement());
+					int clickY = event.getRelativeY(canvas.getElement());
+					int cellX = getCellIndex(clickX);
+					int cellY = getCellIndex(clickY);
+					Cell cell = creatures.getCellAt(cellX, cellY);
+					if (lastModified != null &&
+							cellX == lastModified.getX() &&
+							cellY == lastModified.getY())
+						return;
+					if (mouseDraw) {
+						// we're drawing
+						if (cell == null)
+							drawCell(new Cell(cellX, cellY, true));
+					}
+					else {
+						// we're erasing
+						if (cell != null)
+							eraseCell(cell);
+					}
+					
+				} // end of mouseDown()
+			} // end of onMouseMove()
+		}, MouseMoveEvent.getType())
+		);
+		/*
 		this.registration = addDomHandler(new ClickHandler() {
 			public void onClick(final ClickEvent event) {
 				if (isCanvasClick(event)) {
@@ -327,13 +428,32 @@ public class GameBoard extends Composite implements HasClickHandlers {
 				}
 			}
 		}, ClickEvent.getType());
+		*/
+	}
+	
+	public boolean drawCell(Cell cell) {
+		// Add new creature
+		creatures.addToOrder(cell);
+		fillCell(cell.getX(), cell.getY());
+		lastModified = cell;
+		return true;
+	}
+	
+	public boolean eraseCell(Cell cell) {
+		// Remove creature
+		clearCell(cell);
+		creatures.remove(cell);
+		lastModified = cell;
+		return true;
 	}
 	
 	@Override
 	protected void onUnload() {
 		super.onUnload();
-		registration.removeHandler();
-		registration = null;
+		for (HandlerRegistration reg : registrations) {
+			reg.removeHandler();
+			reg = null;
+		}
 	}
 
 	
@@ -370,7 +490,7 @@ public class GameBoard extends Composite implements HasClickHandlers {
 		return ! (x > width || y > height || x < 0 || y < 0);
 	}
 	
-	public boolean isCanvasClick(ClickEvent click) {
+	public boolean isCanvasClick(MouseEvent<?> click) {
 		int clickX = click.getRelativeX(canvas.getElement());
 		int clickY = click.getRelativeY(canvas.getElement());
 		//clickX += clickOffset;

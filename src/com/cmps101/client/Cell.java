@@ -1,15 +1,28 @@
 package com.cmps101.client;
 
-public class Cell implements Comparable<Cell> {
+//import java.util.UUID;
+
+import com.google.gwt.core.client.GWT;
+
+public class Cell extends Countable implements Comparable<Cell> {
+	static boolean printParent = false;
 	private int x, y, count;
 	private boolean state;
-	private Cell parent;
+	private Cell parent; // used in updating
+	private Cell next, prev;
+	//private UUID id;
+	
 	
 	public Cell(int x, int y, boolean state) {
 		this.x = x;
 		this.y = y;
 		count = 0;
+		next = null;
+		prev = null;
+		//id = UUID.randomUUID();
+		
 		this.state = state;
+		
 	}
 	public Cell(int x, int y) {
 		this(x,y,false);
@@ -18,27 +31,54 @@ public class Cell implements Comparable<Cell> {
 		this(x,y);
 		this.parent = parent;
 	}
+	public Cell(int x, int y, boolean state, Cell parent) {
+		this(x,y,state);
+		this.parent = parent;
+	}
+
+	public boolean hasNext() { return next != null; }
+	public boolean hasPrev() { return prev != null; }
+	
+	public Cell getNext() { return next; }
+	public Cell getPrev() { return prev; }
+	
+	public void setNext(Cell cell) { next = cell; }
+	public void setPrev(Cell cell) { prev = cell; }
 	
 	public int getX() { return x; }
-		
 	public int getY() { return y; }
 	
 	public Cell getParent() { return parent; }
+	public boolean hasParent() { return parent != null; }
+	/*
+	public UUID getId() { return id; }
+	*/
 	
 	public int getNeighbors() { return count; }
 	
-	public void setNeighbors(int count) { this.count = count; }
-	
+	public void clearNeighbors() { this.count = 0; }
+	public void setNeighbors(int num) { this.count = num; }
 	public void incrementNeighbors() { this.count++; }
 	
 	public boolean isAlive() { return state; }
 	
 	public String toString() {
-		String str = "(" + getX() + "," + getY() + ")";
-		str += (! isAlive())? "!" : "";
-		//str += (parent != null)? "=>" + parent.toString() : "";
-		str = count + "_" + str;
+		String str = "[" + getId() + "]";
+		if (! isAlive())
+			str += "!";
+		str += "(" + getX() + "," + getY() + ")";
+		str += "_" + count;
+		if (hasParent() && printParent) {
+			Cell parent = getParent();
+			str += "=>(" + parent.getX() + "," + parent.getY() + ")";
+		}
 		return str;
+	}
+	
+	// Doesn't copy links and neighbors
+	public Cell copy() {
+		Cell clone = new Cell(x,y,state,parent);
+		return clone;
 	}
 	
 	public int compareTo(Cell cell) {

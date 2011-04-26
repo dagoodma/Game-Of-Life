@@ -1,5 +1,7 @@
 package com.cmps101.client;
 
+import java.lang.Math;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -76,11 +78,11 @@ public class GameOfLife implements EntryPoint {
 		*/
 		
 		/* Glider */
+		creatures.add(new Cell(19,17,true));
 		creatures.add(new Cell(20,18,true));
 		creatures.add(new Cell(18,19,true));
+		creatures.add(new Cell(19,19,true));
 		creatures.add(new Cell(20,19,true));
-		creatures.add(new Cell(19,20,true));
-		creatures.add(new Cell(20,20,true));
 		
 		
 		// draw the initial state
@@ -152,57 +154,17 @@ public class GameOfLife implements EntryPoint {
 		return wasReset;
 	}
 	
-	/**
-	 * Calculates the number of neighbors for each cell including dead
-	 * cells touching existing cells, and then updates each cell to
-	 * its next state.
-	 */
+	
 	public boolean nextTurn() {
-		// Note: we are iterating over a different list than we
-		// are appending to in order to gain the use of a more robust
-		// add function via. the CellList instead of iter
-		// and avoid a concurrent modification exception
-		CellList passList = creatures.clone();
-		/*
-		CellList topList = new CellList();
-		CellList midList = new CellList();
-		CellList bottomList = new CellList();
-		*/
+		CellList nextCreatures = creatures.update();
+		creatures = nextCreatures;
 		
-		ListIterator<Cell> iter = passList.listIterator();
-		int i = 0;
-	
-		//GWT.log(passList.toString());
-		// Create neighbor cells for each creature
-		//  and append them to the passList
-		while (iter.hasNext()) {
-			Cell cell = iter.next();
-			cell.setNeighbors(0);
-			
-			// Loop over each neighbor position
-			//  and add a cell to the passList there
-			for (int j = -1; j <= 1; j++) {
-				for (int k = -1; k <= 1; k++) {
-					Cell neighbor = new Cell(cell.getX() + j, cell.getY() + k, cell);
-					neighbor.incrementNeighbors();
-					
-					// Skip this neighbor if it is the alive parent cell
-					if (neighbor.getX() == cell.getX()
-							&& neighbor.getY() == cell.getY()) {
-						continue;
-					}
-					creatures.add(neighbor); // throw them in unsorted
-				} // end of k
-			} // end of j
-			i++;
-
-		} // end of iterator
+		gameBoard.update();
 		
-		// Merge overlapping cells
-		creatures.update();
-		return true;
+		// TODO add creatures.equals checking
+		return creatures.size() > 0;
 	}
-	
+		
 	public CellList getCreatures() {
 		return creatures;
 	}
@@ -250,4 +212,5 @@ public class GameOfLife implements EntryPoint {
 	public boolean wasReset() {
 		return wasReset;
 	}
+
 }
