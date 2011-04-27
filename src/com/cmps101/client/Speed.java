@@ -1,11 +1,11 @@
 package com.cmps101.client;
 
 public enum Speed {
-	SLOWEST (750, "Slowest"),
+	SLOWEST (1000, "Slowest"),
 	SLOW (500, "Slow"),
-	NORMAL (250, "Normal"),
-	FAST (100, "Fast"),
-	FASTEST (50, "Fastest");
+	NORMAL (175, "Normal"),
+	FAST (69, "Fast"),
+	FASTEST (8, "Fastest");
 	
 	private final int value; // in ms
 	private final String text;

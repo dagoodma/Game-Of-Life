@@ -36,9 +36,10 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class GameOfLife implements EntryPoint {
 	private boolean isPlaying = false;
 	private boolean wasReset = false;
-	private int totalTurns = 19;
 	private int turn = 0;
 	private Speed paceOfLife = Speed.NORMAL;
+	private CellPreset preset = CellPreset.SMALL_EXPLODER;
+
 	private int gameSpeed = paceOfLife.value();
 	private GameBoard gameBoard;
 	private CellList creatures = new CellList();
@@ -60,31 +61,9 @@ public class GameOfLife implements EntryPoint {
 	public void initialize() {
 		if (creatures.size() > 0) 
 			creatures.clear();
-		/*
-		creatures.add(new Cell(50,50,true));
-		creatures.add(new Cell(51,50,true));
-		creatures.add(new Cell(52,50,true));
-		creatures.add(new Cell(52,49,true));
-		creatures.add(new Cell(51,48,true));
-		*/
-		/* Exploder 
-	    
-		creatures.add(new Cell(20,19,true));
-		creatures.add(new Cell(20,20,true));
-		creatures.add(new Cell(21,20,true));
-		creatures.add(new Cell(19,21,true));
-		creatures.add(new Cell(21,21,true));
-		creatures.add(new Cell(20,22,true));
-		*/
-		
-		/* Glider */
-		creatures.add(new Cell(19,17,true));
-		creatures.add(new Cell(20,18,true));
-		creatures.add(new Cell(18,19,true));
-		creatures.add(new Cell(19,19,true));
-		creatures.add(new Cell(20,19,true));
-		
-		
+		creatures = preset.getList().clone();
+		turn = 0;
+
 		// draw the initial state
 		gameBoard.update();
 	}
@@ -142,7 +121,6 @@ public class GameOfLife implements EntryPoint {
 			if (isPlaying())
 				pause();
 			initialize(); // resets board
-			turn = 0;
 			wasReset = true;
 		}
 		else  {
@@ -202,6 +180,26 @@ public class GameOfLife implements EntryPoint {
 				}
 			}, gameSpeed);
 		}
+		return true;
+	}
+	
+	public CellPreset getPreset() {
+		return preset;
+	}
+	
+	public boolean setPreset(String name) {
+		CellPreset preset = null;
+		for (CellPreset p : CellPreset.values()) {
+			if (p.getName().equals(name)) {
+				preset = p;
+				break;
+			}
+		}
+		if (preset == null)
+			return false;
+		
+		this.preset = preset;
+		initialize();
 		return true;
 	}
 	

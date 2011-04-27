@@ -52,6 +52,7 @@ public class GameBoard extends Composite
 	@UiField Button playButton;
 	@UiField Button stopButton;
 	@UiField ListBox speedListBox;
+	@UiField ListBox presetListBox;
 	
 	private GameOfLife game;
 	private GWTCanvas canvas;
@@ -102,6 +103,18 @@ public class GameBoard extends Composite
 	    	}
 	    	i++;
 	    }
+	    speedListBox.setTitle("Speed");
+	    
+	    // Preset select
+	    i = 0;
+	    for (CellPreset p : CellPreset.values()) {
+	    	presetListBox.addItem(p.getName());
+	    	if (game.getPreset() == p)
+	    		presetListBox.setItemSelected(i, true);
+	    	i++;
+	    }
+	    
+	    presetListBox.setTitle("Choose a preset board.");
 	    
 	}	
 	
@@ -403,32 +416,6 @@ public class GameBoard extends Composite
 			} // end of onMouseMove()
 		}, MouseMoveEvent.getType())
 		);
-		/*
-		this.registration = addDomHandler(new ClickHandler() {
-			public void onClick(final ClickEvent event) {
-				if (isCanvasClick(event)) {
-					// Pause the game
-					
-					int clickX = event.getRelativeX(canvas.getElement());
-					int clickY = event.getRelativeY(canvas.getElement());
-					int cellX = getCellIndex(clickX);
-					int cellY = getCellIndex(clickY);
-					Cell cell = creatures.getCellAt(cellX, cellY);
-					// Draw or clear
-					if (cell == null) {
-						// Add new creature
-						creatures.addToOrder(new Cell(cellX, cellY, true));
-						fillCell(cellX, cellY);
-					}
-					else {
-						clearCell(cell);
-						creatures.remove(cell);
-					}
-					
-				}
-			}
-		}, ClickEvent.getType());
-		*/
 	}
 	
 	public boolean drawCell(Cell cell) {
@@ -456,7 +443,6 @@ public class GameBoard extends Composite
 		}
 	}
 
-	
 	/**
 	 * Check if the given cell is at a displayable position on 
 	 * the board.
@@ -524,10 +510,6 @@ public class GameBoard extends Composite
 			stopButton.setText("Clear");
 	}
 	
-	public void setGameSpeed(String speed) {
-		game.setPace(speed);
-	}
-	
 	@UiHandler("playButton")
 	void doPlay(ClickEvent event) {
 		game.togglePlay();
@@ -543,10 +525,14 @@ public class GameBoard extends Composite
 	}
 	
 	@UiHandler("speedListBox")
-	void doChange(ChangeEvent event) {
+	void doSpeedChange(ChangeEvent event) {
 		String newSpeed = speedListBox.getValue(speedListBox.getSelectedIndex());
-		setGameSpeed(newSpeed);
+		game.setPace(newSpeed);
 	}
 	
-
+	@UiHandler("presetListBox")
+	void doPresetChange(ChangeEvent event) {
+		String newPreset = presetListBox.getValue(presetListBox.getSelectedIndex());
+		game.setPreset(newPreset);
+	}
 }

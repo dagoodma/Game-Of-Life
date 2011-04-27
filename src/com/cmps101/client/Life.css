@@ -41,26 +41,23 @@ body {
 }
 
 .playButton {
-	/*position: absolute;
-	/*width: 45px; */
-	/*height: 17px; */
-	/*left: 17px;*/
 	margin: 0 0 0 15px;
 	
 }
 
 .stopButton {
-	/*position: absolute;
-	left: 75px;*/
 	margin: 0 0 0 8px;
 	
 }
 
 .speedListBox {
-	/*position: relative;*/
 	width: 85px;
 	margin: 0 0 0 19px;
-	/*left: 140px*/
+}
+
+.presetListBox {
+	width: 164px;
+	margin: 0 0 0 19px;
 }
 
 

@@ -18,6 +18,7 @@ public interface GameResources extends ClientBundle {
 		String playButton();
 		String stopButton();
 		String speedListBox();
+		String presetListBox();
 	}
 
 }

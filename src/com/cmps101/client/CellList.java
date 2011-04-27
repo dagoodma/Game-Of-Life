@@ -78,7 +78,27 @@ public class CellList implements Iterable<Cell> {
 		count++;
 		return true;
 	}
-	
+
+	/**
+	 * Adds then given cell to the list maintaining a sorted order.
+	 * This is Θ(n), and it is only used for drawing new tiles by
+	 * the user interface.
+	 * @param cell is to be added into the list
+	 */
+	public void addToOrder(Cell cell) {
+		if (size() == 0) {
+			add(cell);
+			return;
+		}
+		// Find where to add the cell
+		for (Cell cell_i : this) {
+			if ( cell.compareTo(cell_i) <= 0 ) {
+				addBefore(cell, cell_i);
+				return;
+			}
+		}
+		addLast(cell);
+	}
 	
 	public CellIterator iterator() {
 		return new CellIterator(this);
@@ -126,26 +146,6 @@ public class CellList implements Iterable<Cell> {
 	
 	public int size() {
 		return count;
-	}
-	
-	/**
-	 * Adds then given cell to the list maintaining a sorted order.
-	 * This is Θ(n), and it is only used for drawing new tiles by
-	 * the user interface.
-	 * @param cell is to be added into the list
-	 */
-	public void addToOrder(Cell cell) {
-		if (size() == 0) {
-			add(cell);
-		}
-		// Find where to add the cell
-		for (Cell cell_i : this) {
-			if ( cell.compareTo(cell_i) <= 0 ) {
-				addBefore(cell, cell_i);
-				return;
-			}
-		}
-		addLast(cell);
 	}
 	
 	public CellList merge(CellList list) {
@@ -404,12 +404,17 @@ public class CellList implements Iterable<Cell> {
 	
 	/**
 	 * Copy this list's collection and use it to build a clone.
+	 */
 	 
 	public CellList clone() {
-		CellList list = new CellList((Collection)this);
+		CellList list = new CellList();
+		for ( Cell c : this) {
+			Cell copy = c.copy();
+			list.add(copy);
+		}
 		return list;
 	}
-	*/
+	
 	
 	/**
 	 * Iterates over the list and appends each element as a string.
