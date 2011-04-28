@@ -10,7 +10,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 
 public class CellList implements Iterable<Cell> {
-	private int count, modCount;
+	private int count, modCount; // count the elements and modifications
 	private Cell head, tail;
 	/**
 	 * The CellList is similar to a linked list, but with various extra
@@ -22,6 +22,9 @@ public class CellList implements Iterable<Cell> {
 		clear();
 	}
 	
+	/**
+	 * Clear all element from the list. Θ(1)
+	 */
 	public void clear() {
 		count = 0;
 		modCount = 0;
@@ -29,15 +32,21 @@ public class CellList implements Iterable<Cell> {
 		tail = null;
 	}
 
-	
 	/**
-	 * Adds an element to the end of the list.
+	 * Add the given cell to the end of the list. This method is
+	 * a wrapper for addLast(). Θ(1)
+	 * @param cell to add to the end of the list
+	 * @return
 	 */
 	public boolean add(Cell cell) {
 		addLast(cell);
 		return true;
 	}
 	
+	/**
+	 * Add the given cell to the end of the list as the tail.
+	 * @param cell to add to the end of the list. Θ(1)
+	 */
 	public void addLast(Cell cell) {
 		if (head == null)
 			head = cell;
@@ -51,6 +60,11 @@ public class CellList implements Iterable<Cell> {
 		modCount++;
 	}
 	
+	/**
+	 * Adds the given cell to the front of the list, making it the
+	 * head of the list. Θ(1)
+	 * @param cell to add to the front of the list
+	 */
 	public void addFirst(Cell cell) {
 		if (head != null) {
 			head.setPrev(cell);
@@ -65,6 +79,14 @@ public class CellList implements Iterable<Cell> {
 		modCount++;
 	}
 	
+	/**
+	 * Add the given cell to the list before the given element.
+	 * This method does not check for the element's membership in
+	 * the list. This is Θ(1).
+	 * @param cell to be added
+	 * @param element to insert the cell before
+	 * @return
+	 */
 	protected boolean addBefore(Cell cell, Cell element) {
 		if (element.hasPrev()) {
 			element.getPrev().setNext(cell);
@@ -100,18 +122,35 @@ public class CellList implements Iterable<Cell> {
 		addLast(cell);
 	}
 	
+	/**
+	 * Returns this list as a CellIterator.
+	 */
 	public CellIterator iterator() {
 		return new CellIterator(this);
 	}
 	
+	/**
+	 * Gets the element in the front of the list. Θ(1)
+	 * @return the head of the list
+	 */
 	public Cell getFirst() {
 		return head;
 	}
 	
+	/**
+	 * Gets the element at the end of the list. Θ(1)
+	 * @return the tail of the list
+	 */
 	public Cell getLast() {
 		return tail;
 	}
 
+	/**
+	 * Removes the given cell from the list. This does not check
+	 * if the cell is a member of the list or not! Θ(1)
+	 * @param cell to be removed
+	 * @return the cell that has been removed
+	 */
 	protected Cell remove(Cell cell) {
 		if (head == cell) {
 			if (cell.hasNext())
@@ -135,6 +174,15 @@ public class CellList implements Iterable<Cell> {
 		return cell;
 	}
 	
+	/**
+	 * Determines whether the given cell has coordinates that match
+	 * the coordinates of a cell that is a member in the list. This
+	 * will not compare the states of the cells! It is Θ(n), but it is
+	 * only used by the interface to draw and erase cells.
+	 * @param cell a cell whose coordinates are compared with members
+	 * 			of the list
+	 * @return true if a cell exists at the coordinates and false if not
+	 */
 	public boolean contains(Cell cell) {
 		for (Cell cell_i : this) {
 			if (cell_i.getX() == cell.getX()
@@ -148,6 +196,17 @@ public class CellList implements Iterable<Cell> {
 		return count;
 	}
 	
+	/**
+	 * This method is similar to the merge algorithm for mergesort.
+	 * For this to work properly, both the list and the given list
+	 * must be in sorted order. This method simply returns a list
+	 * that represents the union of the two lists by comparing and
+	 * merging them together. This method if Θ(n) and is used by
+	 * the withNeighbors() functions to merge the neighbor lists
+	 * together.
+	 * @param list is to be merged with this list
+	 * @return the union of the given list with this list in order
+	 */
 	public CellList merge(CellList list) {
 		CellList union = new CellList();
 		CellIterator left = iterator();
@@ -174,11 +233,10 @@ public class CellList implements Iterable<Cell> {
 	
 	/**
 	 * This method generates and returns a new list that consists of
-	 * all of the elements in this list with 8 neighbor tiles for each
-	 * element inserted in order.
-	 * This is the 1st pass and it is Θ(n).
-	 * 
-	 * @return a new list with dead neighbor cells in it
+	 * all of the elements in this list with 8 neighbor tiles created
+	 * for each element in the list inserted in order. This contains
+	 * the first 3 passes of the update() method and it is Θ(n).
+	 * @return a new list with the dead neighbor cells in it
 	 */
 	public CellList withNeighbors() {
 		Cell curr = getFirst();
@@ -272,15 +330,15 @@ public class CellList implements Iterable<Cell> {
 	
 	/**
 	 * This method will generate and return the next generation of
-	 * itself. It does this by first iterating over a this list and
+	 * itself. It does this by first iterating over this list and
 	 * over each cell's neighboring tiles (8 in total). It will then
 	 * remove all duplicate entries and update the neighbor counts of
 	 * each accordingly. Finally, the states of the remaining cells
-	 * will be updated and dead ones removed.
+	 * will be updated and the dead ones removed.
 	 * 
 	 * This method encompasses the entire updating procedure for the
 	 * game of life. There are a total of 5 passes over this list
-	 * within and each one is Θ(n).
+	 * within and each one is Θ(n), and therefore this method is Θ(n).
 	 * 
 	 * @return a new list representing the next generation of this list
 	 */
@@ -363,27 +421,6 @@ public class CellList implements Iterable<Cell> {
 			newList.remove(curr);
 		return newList;
 	} // end of update()
-	
-	/**
-	 * This will iterate the list and remove the element with
-	 * coordinates that match the given cell's
-	 * 
-	 * @param cell coordinates are used to detect and remove
-	 * @return true if an item was found and removed
-	 
-	public boolean remove(Cell cell) {
-		int i = 0;
-		for (Cell cell_i : this) {
-			if (cell_i.getX() == cell.getX() && cell_i.getY() == cell.getY()) {
-				remove(i);
-				count--;
-				return true;
-			}
-			i++;
-		}
-		return false;
-	}
-	*/
 
 	
 	/**
@@ -403,9 +440,8 @@ public class CellList implements Iterable<Cell> {
 	}
 	
 	/**
-	 * Copy this list's collection and use it to build a clone.
+	 * Copy this list and build a clone.
 	 */
-	 
 	public CellList clone() {
 		CellList list = new CellList();
 		for ( Cell c : this) {
@@ -417,7 +453,8 @@ public class CellList implements Iterable<Cell> {
 	
 	
 	/**
-	 * Iterates over the list and appends each element as a string.
+	 * Iterates over the list and returns a string with each element
+	 * appended to it.
 	 */
 	public String toString() {
 		String str = "";

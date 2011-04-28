@@ -1,0 +1,116 @@
+CMPS 101 - Spring 11
+
+Program 2: Game of Life 
+by David Goodman 
+
+This program is a web application created using Google Web Toolkit
+(GWT), which is a Java framework for designing web applications. You
+can run the application by visiting: http://m4l3.com/life
+
+
+Implementation:
+---------------------------------------------------
+This game of life is based off Conway's game of life. More information
+can be found here: http://en.wikipedia.org/wiki/Conway's_Game_of_Life
+
+This release includes an O(n) updating algorithm, clickable tiles,
+click then dragable tiles, play/pause and reset/clear buttons, speed
+selection drop down menu, and a preset selection drop down menu.
+Although this release is only a beta, it is as complete as is needed
+to meet the specifications for program 2.
+
+At the heart of this implementation is a class called the CellList,
+which can be found at src/com/cmps101/client/CellList.java. The
+CellList is basically a linked list that has been custom built to
+hold all of the cells used in the game of life. Most of its operations
+are Θ(1), but there are a few methods within that are used by the
+user interface and that are Θ(n). Such methods are not used in the
+updating procedure for the game.
+
+The state of the game is contained in a CellList called creatures.
+When the game is to be advanced to the next turn, creatures is set
+to equal a new list returned by calling the creatures.update() method.
+The update() method starts by calling the withNeighbors() method, which
+returns a version of the list with 8 neighbor tiles added in for each
+cell in the list. Three Θ(n) passes are needed to create this one
+neighbor list; one Θ(n) pass to generate the neighbors and two more
+Θ(n) passes to merge the three neighbor lists into one. Once the
+update() method has the list containing each cell with its 8 bordering,
+it iterates over that list in one Θ(n) pass to detect and remove all
+of the duplicate entries (cells with equivalent coordinates) and
+increments the neighbor count for each duplicate accordingly.
+Lastly, a fifth and final Θ(n) pass is made to call the nextState()
+method on each cell. nextState() will update the cell's state (alive
+or dead) depending on the neighbor count. If the cell's next state
+is dead then it is removed from the list. After these five Θ(n) passes
+our list containing the next generation of the game is completed.
+
+
+Background (GWT info - skip if desired):
+---------------------------------------------------
+
+As mentioned above, this program is a Google Web Toolkit application.
+The included source code is not meant to be compiled by the grader,
+unless they know how to compile a GWT Java EE project. More info on
+GWT can be found here: http://code.google.com/webtoolkit/
+Basically, applications are written in Java and then cross-compiled
+into javascript to be run on any browser without the need for
+invoking a Java client at all (no JRE required).
+
+    The directory containing all of the source code is:
+src/com/cmps101/client/ and the main entry point can be found in
+GameOfLife.java. This file houses some of the game's logic such
+as the RepeatingCommand used to update the game at a specified pace
+as well as the controls for manipulating the state of the game, 
+which are operated from GameBoard.java. The GameBoard class makes up
+the user interface. This class's job is simplified by a GWT concept
+called the UiBinder. As GWT applications are composed of Widgets, the
+UiBinder file is an xml file that specifies the layout for a partic-
+ular widget. Our layout is defined in GameBoard.ui.xml, where panels
+and widgets that make up the web content are listed and their respect-
+ive CSS styles applied. The GameBoard Widget is then spared the task
+of programmatically defining the interface in depth by annotations
+such as: @UiTemplate, @UiField, and @UiHanlder. These annotations do
+a good portion of dirty work by allowing the GWT compiler to insert
+the neccessary code in their place.
+
+    Lastly I should mention the file GameResources.java. This interface
+is just a hook for the CSS file Life.css, and is an exten sion of the
+ClientBundle. If this game had any sounds or graphics they would be
+specified by here file for access by the GameBoard. Instead, all that
+can be seen is the CssResource GameCss and its accessor method
+GameResources.css(). In GWT all CSS classes are obfuscated with the
+rest of the code so that all of their names become random Strings.
+Because of this feature methods are needed to retrieve these obfuscated
+class names. In this way the class names can be randomized and replaced
+while still allowing the code runtime access.
+
+
+Results:
+----------------------------------------------------
+When I first began creating the game of life I constructed a version
+that updated in Θ(n^2) time. While the drawbacks were not apparent
+at first, it soon became obvious (when enough cells were alive in the
+game) that my algorithm was inefficient. At a normal game pace, the
+game would consume 20% cpu resources with enough creatures on the
+screen. Then, when I increased the game pace to fastest I saw the cpu
+ussage jump to 50% and the game would crawl along. Such a delay
+became noticable that I made improvement of the game's update
+algorithm my main goal.
+
+The main reason for the slowness was that each neighbor cell had to be
+added back into the list in a sorted order and so there was a search
+being done for each of the n elements being iterated over. This extra
+searching effectively raised the games runtime to Θ(n^2). Once I was
+able to re-write my CellList from scratch and have direct access to
+all of the neccessary pointers, I was able to make the game's update
+procedure run in Θ(n) time. This major redesign of the game's code
+lead to the introduction of 3 pointers into the withNeighbors() method
+in order to keep the list in a sorted order while creating neighbors
+that would overlap previously created neighbors. Now the game runs at
+the fastest speed with little effort and only uses about 15% cpu even
+while processing hundreds and hundreds of cells each 5/1000ths of
+a second.
+
+Please see the code for more information. Many comments have been added.
+
