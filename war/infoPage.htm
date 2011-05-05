@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Game of Life - Info</title>
+    <style type="text/css">
+    	A:link {text-decoration: underline; color:#555; }
+		A:visited {text-decoration: underline; color: #555; }
+		A:active {text-decoration: underline; color: #286c6f; }
+		A:hover {text-decoration: underline; color:#286c6f; }
+    	
+    	body {
+    		font-family: "Courier New", Courier, monospace;
+			font-size:80%;
+			}
+		.heading {
+			font-size:large;
+			color: #1E9E3E;
+		}
+		
+    </style>
+  </head>
+<body>
+<div>
+
+This application was designed and created by <a href="emailto:dagoodma@ucsc.edu">David Goodman</a>
+for a University of California, Santa Cruz computer science (cmps101) <a href="prog2.pdf"
+target="new_page">class assignment</a>. The project has been made open source! Visit us on
+<a href="https://github.com/dagoodma/Game-Of-Life" target="new_page">GitHub</a>.
+<br><br>
+This is an implementation of the
+ <a href="http://en.wikipedia.org/wiki/Conway's_Game_of_Life" target="new_page">Game of Life</a>, which is a 
+cellular automaton invented by Cambridge mathematician John Conway. It was written entirely in 
+Java using <a href="http://code.google.com/webtoolkit/" target="new_page">Google Web Toolkit (GWT)</a>. Although
+the application is written in Java no Java Runtime Environment (JRE) is required to run it
+because GWT cross-compiles everything into JavaScript and optimizes and obfuscates it to be run
+on any web server and in any browser (including Androids and iPhones).
+
+<p class="heading">Rules for Life:</p>
+<ol>
+	<li>Any live cell with fewer than two live neighbours dies, as if caused by under-population.</li>
+	<li>Any live cell with two or three live neighbours lives on to the next generation.</li>
+	<li>Any live cell with more than three live neighbours dies, as if by overcrowding.</li>
+	<li>Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.</li>
+</ol>
+These rules govern the Game of Life at a fundamental level, but the most fascinating aspect of the game
+are the new rules and larger patterns that emerge over the turns. In fact, this game is a universal 
+computer and creatures such as gliders can be utilized to represent all of the essential logic gates needed
+to build a computer. For more information read <a href="life.pdf" target="new_page">this document</a>.
+</div>
+</body>
+</html>

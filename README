@@ -1,6 +1,4 @@
-CMPS 101 - Spring 11
-
-Program 2: Game of Life 
+A Game of Life programming assignment (http://m4l3.com/prog2.pdf)
 by David Goodman 
 
 This program is a web application created using Google Web Toolkit
@@ -12,9 +10,10 @@ Implementation:
 ---------------------------------------------------
 This game of life is based off Conway's game of life. More information
 can be found here: http://en.wikipedia.org/wiki/Conway's_Game_of_Life
+For a very interesting perspective read: http://m4l3.com/life.pdf
 
 This release includes an O(n) updating algorithm, clickable tiles,
-click then dragable tiles, play/pause and reset/clear buttons, speed
+click then draggable tiles, play/pause and reset/clear buttons, speed
 selection drop down menu, and a preset selection drop down menu.
 Although this release is only a beta, it is as complete as is needed
 to meet the specifications for program 2.
@@ -94,8 +93,8 @@ at first, it soon became obvious (when enough cells were alive in the
 game) that my algorithm was inefficient. At a normal game pace, the
 game would consume 20% cpu resources with enough creatures on the
 screen. Then, when I increased the game pace to fastest I saw the cpu
-ussage jump to 50% and the game would crawl along. Such a delay
-became noticable that I made improvement of the game's update
+usage jump to 50% and the game would crawl along. Such a delay
+became noticeable that I made improvement of the game's update
 algorithm my main goal.
 
 The main reason for the slowness was that each neighbor cell had to be
@@ -103,7 +102,7 @@ added back into the list in a sorted order and so there was a search
 being done for each of the n elements being iterated over. This extra
 searching effectively raised the games runtime to Θ(n^2). Once I was
 able to re-write my CellList from scratch and have direct access to
-all of the neccessary pointers, I was able to make the game's update
+all of the necessary pointers, I was able to make the game's update
 procedure run in Θ(n) time. This major redesign of the game's code
 lead to the introduction of 3 pointers into the withNeighbors() method
 in order to keep the list in a sorted order while creating neighbors
@@ -113,4 +112,3 @@ while processing hundreds and hundreds of cells each 5/1000ths of
 a second.
 
 Please see the code for more information. Many comments have been added.
-

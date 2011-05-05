@@ -3,6 +3,9 @@
 @def gameWidth 450px;
 @def gameHeight 450px;
 	
+@def infoWidth 415px;
+@def infoHeight 350px;
+	
 A:link {text-decoration: underline; color:#999999; }
 A:visited {text-decoration: underline; color: #999999; }
 A:active {text-decoration: underline; color: #b8fcff; }
@@ -10,6 +13,7 @@ A:hover {text-decoration: underline; color:#b8fcff; }
 
 body {
    background-color:#024001;
+   font-family: "Courier New", Courier, monospace;
    margin: 0px;
    padding: 0px;
 }
@@ -60,4 +64,36 @@ body {
 	margin: 0 0 0 19px;
 }
 
+.infoButton {
+	position:absolute;
+	width: 21px;
+	height: 20px;
+	right:12px;
+	color: #000;
+	font-weight: bold;
+	font-size: 107%;
+	background-color: #e0e0e0;
+	border-top: 1px solid #321d99;
+	border-right: 1px solid #0043b0;
+	border-left: 1px solid #3d9fde;
+	border-bottom: 1px solid #303030;
+	padding-top:1px;
+	outline: 1px solid #303030
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
+}
+
+.infoFrame {
+	border: 0px;
+	}
+	
+@external .Caption;
+.infoBox .Caption {
+	/*font-family: “Georgia”, serif;*/
+	font-size:x-large;
+	color: #1E9E3E;
+	text-align:center;
+	}
+	
 

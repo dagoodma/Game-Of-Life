@@ -23,6 +23,9 @@
     		<g:Cell >
     				<g:ListBox ui:field="presetListBox" styleName="{res.css.presetListBox}"/>
     		</g:Cell>
+    		<g:Cell >
+    				<g:Button text="?" ui:field="infoButton" styleName="{res.css.infoButton}" />
+    		</g:Cell>
     		</g:HorizontalPanel>
     		</g:Cell>
     </g:VerticalPanel>

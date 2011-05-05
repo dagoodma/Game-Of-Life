@@ -51,11 +51,13 @@ public class GameBoard extends Composite
 	//@UiField AbsolutePanel buttonWindow;
 	@UiField Button playButton;
 	@UiField Button stopButton;
+	@UiField Button infoButton;
 	@UiField ListBox speedListBox;
 	@UiField ListBox presetListBox;
 	
 	private GameOfLife game;
 	private GWTCanvas canvas;
+	private GameInfo info = null;
 	private ArrayList<HandlerRegistration> registrations
 		= new ArrayList<HandlerRegistration>();
 	private CellList creatures; // creatures drawn
@@ -519,9 +521,23 @@ public class GameBoard extends Composite
 	
 	@UiHandler("stopButton")
 	void doStop(ClickEvent event) {
-		game.toggleReset();
-		updatePlayButton();
-		updateResetButton();
+		if (game.toggleReset()) {
+			updatePlayButton();
+			updateResetButton();
+		}
+	}
+	
+	@UiHandler("infoButton")
+	void doInfo(ClickEvent event) {
+		if (info == null) {
+			info = new GameInfo();
+			info.show();
+			return;
+		}
+		if (info.isShowing())
+			info.hide();
+		else 
+			info.show();
 	}
 	
 	@UiHandler("speedListBox")

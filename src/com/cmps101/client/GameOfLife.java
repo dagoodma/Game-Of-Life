@@ -117,6 +117,8 @@ public class GameOfLife implements EntryPoint {
 	 */
 	public boolean toggleReset() {
 		if (!wasReset) {
+			if (turn < 1)
+				return false;
 			// Reset
 			if (isPlaying())
 				pause();
@@ -129,7 +131,7 @@ public class GameOfLife implements EntryPoint {
 			wasReset = false;
 		}
 		
-		return wasReset;
+		return true;
 	}
 	
 	
