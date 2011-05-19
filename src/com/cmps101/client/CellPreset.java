@@ -4,6 +4,11 @@ import java.util.ArrayList;
 
 import com.google.gwt.core.client.GWT;
 
+/**
+ * This class contains preset lists of cells
+ * @author brelix
+ *
+ */
 public enum CellPreset {
 	CLEAR("Clear"),
 	GLIDER("Glider", new Cell(22,20,true), new Cell(20,21,true),
@@ -72,6 +77,10 @@ public enum CellPreset {
 	public String toString() { return getName() + ": " + list; }
 	public String getName() { return name; }
 	
+	/**
+	 * Returns the cellList for the current preset.
+	 * @return CellList of the preset
+	 */
 	public CellList getList() {
 		return list;
 	}

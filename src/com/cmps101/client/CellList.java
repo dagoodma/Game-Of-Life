@@ -23,6 +23,13 @@ public class CellList implements Iterable<Cell> {
 	}
 	
 	/**
+	 * Returns the number of cells in the list.
+	 */
+	public int size() {
+		return count;
+	}
+	
+	/**
 	 * Clear all element from the list. Θ(1)
 	 */
 	public void clear() {
@@ -85,9 +92,10 @@ public class CellList implements Iterable<Cell> {
 	 * the list. This is Θ(1).
 	 * @param cell to be added
 	 * @param element to insert the cell before
+	 * @deprecated No longer care about order as of v1.505. See {@link #CellHash}
 	 * @return
 	 */
-	protected boolean addBefore(Cell cell, Cell element) {
+	@Deprecated protected boolean addBefore(Cell cell, Cell element) {
 		if (element.hasPrev()) {
 			element.getPrev().setNext(cell);
 			cell.setPrev(element.getPrev());
@@ -105,9 +113,10 @@ public class CellList implements Iterable<Cell> {
 	 * Adds then given cell to the list maintaining a sorted order.
 	 * This is Θ(n), and it is only used for drawing new tiles by
 	 * the user interface.
+	 * @deprecated No longer care about order as of v1.505. See {@link #CellHash}
 	 * @param cell is to be added into the list
 	 */
-	public void addToOrder(Cell cell) {
+	@Deprecated public void addToOrder(Cell cell) {
 		if (size() == 0) {
 			add(cell);
 			return;
@@ -174,6 +183,11 @@ public class CellList implements Iterable<Cell> {
 		return cell;
 	}
 	
+	/*
+	 * contains() removed as of v1.505. It wasn't being used anywhere,
+	 * not even in the interface which just uses remove without
+	 * checking.
+	 */
 	/**
 	 * Determines whether the given cell has coordinates that match
 	 * the coordinates of a cell that is a member in the list. This
@@ -182,7 +196,7 @@ public class CellList implements Iterable<Cell> {
 	 * @param cell a cell whose coordinates are compared with members
 	 * 			of the list
 	 * @return true if a cell exists at the coordinates and false if not
-	 */
+	 
 	public boolean contains(Cell cell) {
 		for (Cell cell_i : this) {
 			if (cell_i.getX() == cell.getX()
@@ -195,7 +209,7 @@ public class CellList implements Iterable<Cell> {
 	public int size() {
 		return count;
 	}
-	
+	*/
 	/**
 	 * This method is similar to the merge algorithm for mergesort.
 	 * For this to work properly, both the list and the given list
@@ -205,9 +219,10 @@ public class CellList implements Iterable<Cell> {
 	 * the withNeighbors() functions to merge the neighbor lists
 	 * together.
 	 * @param list is to be merged with this list
+	 * @deprecated No longer handled here as of v1.505. See {@link CellHash.java}
 	 * @return the union of the given list with this list in order
 	 */
-	public CellList merge(CellList list) {
+	@Deprecated public CellList merge(CellList list) {
 		CellList union = new CellList();
 		CellIterator left = iterator();
 		CellIterator right = list.iterator();
@@ -237,8 +252,9 @@ public class CellList implements Iterable<Cell> {
 	 * for each element in the list inserted in order. This contains
 	 * the first 3 passes of the update() method and it is Θ(n).
 	 * @return a new list with the dead neighbor cells in it
+	 * @deprecated No longer handled here as of v1.505. See {@link CellHash.java}
 	 */
-	public CellList withNeighbors() {
+	@Deprecated public CellList withNeighbors() {
 		Cell curr = getFirst();
 		CellList finalList;
 		
@@ -340,9 +356,10 @@ public class CellList implements Iterable<Cell> {
 	 * game of life. There are a total of 5 passes over this list
 	 * within and each one is Θ(n), and therefore this method is Θ(n).
 	 * 
+	 * @deprecated No longer handled here as of v1.505. See {@link CellHash.java}
 	 * @return a new list representing the next generation of this list
 	 */
-	public CellList update() {
+	@Deprecated public CellList update() {
 		/*
 		 * First we get this list with all of its neighboring tiles
 		 * in it. (3 passes).

@@ -1,6 +1,7 @@
 package com.cmps101.client;
 
-public abstract class Countable {
+/** @see {@link Verifiable.java} **/
+@Deprecated public abstract class Countable {
 	static int total = 0;
 	final int id;
 	

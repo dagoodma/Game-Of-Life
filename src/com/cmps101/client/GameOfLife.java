@@ -42,7 +42,7 @@ public class GameOfLife implements EntryPoint {
 
 	private int gameSpeed = paceOfLife.value();
 	private GameBoard gameBoard;
-	private CellList creatures = new CellList();
+	private CellHash creatures = new CellHash();
 	
 	/**
 	 * This is the entry point method.
@@ -59,9 +59,7 @@ public class GameOfLife implements EntryPoint {
 	}
 	
 	public void initialize() {
-		if (creatures.size() > 0) 
-			creatures.clear();
-		creatures = preset.getList().clone();
+		creatures.setList(preset.getList());
 		turn = 0;
 
 		// draw the initial state
@@ -136,16 +134,16 @@ public class GameOfLife implements EntryPoint {
 	
 	
 	public boolean nextTurn() {
-		CellList nextCreatures = creatures.update();
-		creatures = nextCreatures;
+		//CellList nextCreatures = creatures.update();
+		//creatures = nextCreatures;
 		
-		gameBoard.update();
+		//gameBoard.update();
 		
 		// TODO add creatures.equals checking
 		return creatures.size() > 0;
 	}
 		
-	public CellList getCreatures() {
+	public CellHash getCreatures() {
 		return creatures;
 	}
 	

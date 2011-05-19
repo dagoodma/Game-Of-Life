@@ -1,17 +1,12 @@
 package com.cmps101.client;
 
-//import java.util.UUID;
 
-import com.google.gwt.core.client.GWT;
-
-public class Cell extends Countable implements Comparable<Cell> {
+public class Cell extends Verifiable implements Comparable<Cell> {
 	static boolean printParent = false;
 	private int x, y, count;
 	private boolean state;
 	private Cell parent; // used in updating
 	private Cell next, prev;
-	//private UUID id;
-	
 	
 	public Cell(int x, int y, boolean state) {
 		this.x = x;
@@ -19,10 +14,8 @@ public class Cell extends Countable implements Comparable<Cell> {
 		count = 0;
 		next = null;
 		prev = null;
-		//id = UUID.randomUUID();
-		
+
 		this.state = state;
-		
 	}
 	public Cell(int x, int y) {
 		this(x,y,false);
@@ -50,12 +43,9 @@ public class Cell extends Countable implements Comparable<Cell> {
 	
 	public Cell getParent() { return parent; }
 	public boolean hasParent() { return parent != null; }
-	/*
-	public UUID getId() { return id; }
-	*/
+	
 	
 	public int getNeighbors() { return count; }
-	
 	public void clearNeighbors() { this.count = 0; }
 	public void setNeighbors(int num) { this.count = num; }
 	public void incrementNeighbors() { this.count++; }
@@ -79,6 +69,17 @@ public class Cell extends Countable implements Comparable<Cell> {
 	public Cell copy() {
 		Cell clone = new Cell(x,y,state,parent);
 		return clone;
+	}
+	
+	/**
+	 * This will return true if this cell's coordinates match the ones
+	 * given as x and y.
+	 * @param x coordinate of cell
+	 * @param y coordinate of cell
+	 * @return True if this cell has the given coordinates x and y.
+	 */
+	public boolean isAt(int x,int y) {
+		return getX() == x && getY() == y;
 	}
 	
 	public int compareTo(Cell cell) {
