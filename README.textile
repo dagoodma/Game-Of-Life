@@ -1,11 +1,11 @@
 A @Game of Life@ programming assignment using a hash table approach. See "program 3":http://m4l3.com/prog3 for more information on the assignment.
 
-This program is a web application created using Google Web Toolkit (GWT), which is a Java framework for designing web applications. You can run the application by visiting: http://m4l3.com/life
+This program is a web application created using "Google Web Toolkit (GWT)":http://code.google.com/webtoolkit/, which is a Java framework for designing web applications. You can run the application by visiting: "http://m4l3.com/life":http://m4l3.com/life
 
 
 h2. Implementation
 
-This game of life is based off Conway's Game of Life. More information can be found here: http://en.wikipedia.org/wiki/Conway's_Game_of_Life. For a very interesting perspective read: http://m4l3.com/life.pdf. This release is to meet the specifications for program 3, which is an assignment for a computer science class at UC, Santa Cruz. Currently, the features that are available in this version, @v1.520@, include an O(n) game updating algorithm, drawing tiles by clicking, as well as drawing tiles by clicking and dragging, play/pause button, reset/clear button, speed selection drop down menu, and a preset selection drop down menu. These are the same features available in the last version, v1.505, except that the data structure that embodies the game has been changed from a linked list to a hash table.
+This game of life is based off Conway's Game of Life. More information can be found here: "wikipedia.org/wiki/Conway's_Game_of_Life":http://en.wikipedia.org/wiki/Conway's_Game_of_Life. For a very interesting perspective read: m4l3.com/life/life.pdf":http://m4l3.com/life/life.pdf. This release is to meet the specifications for program 3, which is an assignment for a computer science class at UC, Santa Cruz. Currently, the features that are available in this version, @v1.520@, include an O(n) game updating algorithm, drawing tiles by clicking, as well as drawing tiles by clicking and dragging, play/pause button, reset/clear button, speed selection drop down menu, and a preset selection drop down menu. These are the same features available in the last version, v1.505, except that the data structure that embodies the game has been changed from a linked list to a hash table.
 
 
 h3. Hash Table
@@ -20,7 +20,7 @@ h3. Update Method
 
 h2. Background 
 
-As mentioned above, this program is a Google Web Toolkit application. The included source code is not meant to be compiled by the grader, unless they know how to compile a GWT Java EE project. More info on GWT can be found here: http://code.google.com/webtoolkit/ Basically, applications are written in Java and then cross-compiled into javascript to be run on any browser without need for a Java Runtime Environment (JRE).
+As mentioned above, this program is a Google Web Toolkit application. The included source code is not meant to be compiled by the grader, unless they know how to compile a GWT Java EE project. Basically, applications are written in Java and then cross-compiled into javascript to be run on any browser without need for a Java Runtime Environment (JRE).
 
     The directory containing all of the source code is: @src/com/cmps101/client/@. The GameOfLife class contains the onModuleLoad() function, which is defined as the entry point for the GWT application. This file houses some of the game's logic such as the RepeatingCommand used to update the game at a specified rate as well as the controls for manipulating the state of the game--which are defined in the GameBoard class (GameBoard.java), which makes up the user inteface. This class's job is simplified by a GWT concept called the UiBinder. As GWT applications are composed of Widgets, the UiBinder file is an xml file that specifies the layout for a particular widget. Our layout is defined in GameBoard.ui.xml, where panels and widgets that make up the web content are to be defined, and if desired, their respective CSS styles be set. The GameBoard Widget is then simplified in by various GWT annotations such as: @UiTemplate, @UiField, and @UiHanlder. These annotations do a good portion of dirty work by allowing the GWT compiler to substitute the necessary code in their place.
 
