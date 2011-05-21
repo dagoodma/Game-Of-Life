@@ -457,7 +457,7 @@ public class GameBoard extends Composite
 	 */
 	public boolean drawCell(Cell cell) {
 		// Insert new creature
-		if (! creatures.insert(cell))
+		if (! creatures.add(cell))
 			return false; // already exists
 		
 		fillCell(cell.getX(), cell.getY());

@@ -1,0 +1,64 @@
+             Game of life with a Hash Table
+Program 3                                    CMPS101, S11, MW
+posted 5-10-11                               due midnight of 5-19-11 in locker
+
+Goal: Implement the Game of Life using a hash table.
+Your implementation must be O(n) on the average per iteration.
+Here n is the number of live cells. 
+For the analysis you can ignore initialization cost of the hash table
+and assume that the dictionary operations are O(1) on the average.
+
+Basic problem:
+
+I) Implement the hash table (with chaining):
+  Write a print routine for the hash table
+  (for debugging purposes only).
+  Test your Search, Insert, and Delete operations
+  on a small hash table before starting on Game of Life.
+
+II) Life: 
+  The node representing a cell in the hash table
+  has the following fields:
+  status, count, x/y coordinates, left/right pointers.
+
+  A separate linked list will hold pointers to all cells in the hash table.
+
+Initialization:
+  Put you initial generation of live cells into the
+  hash table and the list.
+  Choose table size as m=2^7=128 and start with the hash function
+  h((i,j)) = lfloor m (i A + j B - lfloor i A + j B rfloor ) rfloor
+  where A = (sqrt(5)-1)/4, B=(sqrt(3)-1)/2.4
+For each generation
+  Go thru the list with a scanner:
+  - for each of the 8 neighbors
+    * search for the neighbor in the hash table
+         if cell found then 
+	     increment count in the cell
+                       else 
+	     insert cell into hash table with count 1, status=dead
+             and insert node with pointer to the new cell
+             at the beginning of the list before position of the scanner
+  Go thru the list a second time 
+  (the list now contains the dead neighbor nodes followed by the live nodes):
+  - determine whether the cell will survive or not
+  - delete non surviving cells from hash table and the list
+  - set count of the surviving cells to 0
+
+Write a high level summary of your algorithm in which
+you reason that your average run time is O(n)
+assuming that all hash operations are average time O(1)
+and ignoring the initialization cost of the hash table.
+
+Make your program nicely modular with a reasonable amount
+of comments.
+
+Extra credit:
+- Try different hash functions and compare the performance.
+- Keep track of number of live cells,
+  if table gets over or under crowded then resize your
+  table and reload current live cells.
+- Compare running time to the linked list implementation of
+  previous program.
+- Any other idea you want to try?
+- Pls document what you tried in your summary

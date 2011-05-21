@@ -3,6 +3,11 @@ package com.cmps101.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 
+/**
+ * 
+ * @author <a href="mailto:dagoodma@ucsc.edu">David Goodman</a>
+ *
+ */
 public class CellHash implements Iterable<Cell> {
 	/*
 	 * Default Parameters
@@ -11,11 +16,11 @@ public class CellHash implements Iterable<Cell> {
 	private final double keyA = (Math.sqrt(5.0) - 1)/4,
 						 keyB = (Math.sqrt(3.0) - 1)/2.4;
 	
-	private CellList verifier;
+	private VerifierList verifier;
 	private CellList[] table;
 	
 	public CellHash() {
-		verifier = new CellList();
+		verifier = new VerifierList();
 		table = new CellList[tableSize];
 	}
 	
@@ -23,7 +28,8 @@ public class CellHash implements Iterable<Cell> {
 	 * Clear all element from the hash. O(n)
 	 */
 	public void clear() {
-		for (Cell cell : verifier) {
+		for (Verifiable verif : verifier) {
+			Cell cell = (Cell)verif;
 			if (!delete(cell))
 				GWT.log("Couldn't delete " + cell + " from hash.");
 		}
@@ -45,8 +51,7 @@ public class CellHash implements Iterable<Cell> {
 		int index = hash(cell.getX(), cell.getY());
 		table[index].remove(cell);
 		
-		// Delete from verifier
-		cell.setVerifier(null); // clear pointer
+		// Delete from verifier O(1)
 		verifier.remove(cell);
 		
 		return true;
@@ -68,10 +73,11 @@ public class CellHash implements Iterable<Cell> {
 	}
 	
 	/**
-	 * Returns this hash as a CellIterator.
+	 * Returns this hash as a CellIterator in O(1) time.
 	 */
 	public CellIterator iterator() {
-		return new CellIterator(verifier);
+		CellIterator iter = verifier.iterator();
+		return iter;
 	}
 	
 	/**
@@ -81,25 +87,31 @@ public class CellHash implements Iterable<Cell> {
 	 * @return hash table index
 	 */
 	public int hash(int i, int j) {
-		return (int)Math.floor( tableSize * (i*keyA + j*keyB - Math.floor(i*keyA + j*keyB)) );
+		return (int)Math.floor( tableSize * (i*keyA + j*keyB - 
+				Math.floor(i*keyA + j*keyB)) );
 	}
 	
 	/**
-	 * Insert a cell into the hash table and add it to the verifier
-	 * array. This will return false if the element is a duplicate.
-	 * Runs in O(n) because it uses the search function.
+	 * Wraps the insert() method but insures that the element to be
+	 * inserted doesn't already exist. This will return false if
+	 * the element is a duplicate. Runs in O(n) because it uses the
+	 * search function to check for redundancy.
 	 * @param cell to be added
 	 * @return true if the cell was inserted
 	 */
-	public boolean insert(Cell cell) {
-		// generate the hash index
-		int index = hash(cell.getX(), cell.getY());
-		GWT.log("Adding " + cell + " to index " + index);
-		
+	public boolean add(Cell cell) {
 		Cell found = search(cell.getX(), cell.getY());
 		if (found != null) {
 			return false;
 		}
+		
+		insert(cell);
+		return true;
+	}
+	
+	protected void insert(Cell cell) {
+		// generate the hash index
+		int index = hash(cell.getX(), cell.getY());
 		
 		// Initialize table row if needed
 		if (table[index] == null)
@@ -107,8 +119,6 @@ public class CellHash implements Iterable<Cell> {
 		
 		table[index].addFirst(cell);
 		verifier.addFirst(cell);
-		cell.setVerifier(verifier);
-		return true;
 	}
 	
 	/** 
@@ -121,30 +131,98 @@ public class CellHash implements Iterable<Cell> {
 		clear(); // O(n)
 	
 		for (Cell cell : list) {
-			if (!insert(new Cell(cell.getX(), cell.getY(), cell.isAlive())))
+			if (!add(new Cell(cell.getX(), cell.getY(), cell.isAlive())))
 				GWT.log("Couldn't insert " + cell + " into hash.");
-			int i = 0;
-			for (CellList listt : table) {
-				if (listt != null)
-					GWT.log(i + ": " + listt.toString());
-				i++;
-			}
 		}
-		
-		
-		
 	}
 	
 	/**
-	 * Find a cell with the given coordinates. Simply wraps
-	 * CellList.getCellAt(), which iterates itself. Runs in O(n).
+	 * Find a cell with the given coordinates.Iterates the verifier
+	 * list to find the cell with the given coords. Runs in O(n).
 	 * @param i x coordinate
 	 * @param j y coordinate
 	 * @return cell with given coordinates or null if not found
 	 */
 	public Cell search(int i, int j) {
-		Cell cell = verifier.getCellAt(i,j);
-		return cell;
+		for (Verifiable verif : verifier) {
+			Cell cell = (Cell)verif;
+			if (cell.getX() == i && cell.getY() == j)
+				return cell;
+		}
+		return null;
+	}
+	
+	/**
+	 * Updates the cell in the Game of Life to advance to the next
+	 * turn. This is done in 2 passes: the first one is O(n*lg(n)),
+	 * and the second is O(n).
+	 */
+	public void update() {
+		/* First iteration creates dead neighboring cells and
+		 * increments the count of existing cells. Runs n*lg(n)
+		 */
+		for (Cell liveCell : this) {
+			/* Iterate the 3x3 tiles centered at this liveCell element,
+			 * but skip the live parent cell. This will no doubt add a
+			 * constant 9 multiplier to the running time (9*n).
+			 */
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					if (i == 0 && j == 0)
+						continue;
+					int x = liveCell.getX() + i,
+						y = liveCell.getY() + j;
+					Cell neighborCell = null;
+					CellList rowList = table[hash(x,y)];
+					
+					/* Search the rowList, which contains a very
+					 * small portion of the n cells in the hash,
+					 * so this will likely run in O(1 + k/n) time
+					 * due to lookup comparison, where k is the
+					 * tableSize for the hash.
+					 */ 
+					if (rowList != null) {
+						for (Cell cell_i : rowList) {
+							if (cell_i.getX() == x &&
+								cell_i.getY() == y) {
+								neighborCell = cell_i;
+								break;
+							}
+						}
+					}
+					/* Either increment the count of the existing cell
+					 * or create a new neighbor cell to use here.
+					 * If the neighboring cell existed and is alive
+					 * then increment the alive parent cell only.
+					 */
+					if (neighborCell == null) {
+						neighborCell = new Cell(x,y,false,liveCell);
+						insert(neighborCell); // O(1) operation
+					}
+					
+					if (neighborCell.isAlive()) {
+						liveCell.incrementNeighbors();
+					}
+					else {
+						neighborCell.incrementNeighbors();
+					}
+				} // end of for loop j
+			} // end of for loop i
+		} // end of foreach
+
+		/* Lastly, iterate over all of the cells in the hash and
+		 * update their states, deleting all of the dead cells. This
+		 * runs in O(n) time.
+		 */
+		for (Cell cell : this) {
+			// Update and delete the dead cells
+			if (!cell.nextState())
+				delete(cell); // O(1) operation
+			// Reset count
+			cell.clearNeighbors(); // O(1) operation
+		}
+		
+		//toLog();
 	}
 	
 	/**
@@ -160,5 +238,14 @@ public class CellHash implements Iterable<Cell> {
 	 */
 	public String toString() {
 		return verifier.toString();
+	}
+	
+	public void toLog() {
+		int i = 0;
+		for (CellList listt : table) {
+			if (listt != null && listt.size() > 0)
+				GWT.log(i + ": " + listt.toString() + "\n");
+			i++;
+		}
 	}
 }

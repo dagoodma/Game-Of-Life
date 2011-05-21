@@ -136,8 +136,9 @@ public class GameOfLife implements EntryPoint {
 	public boolean nextTurn() {
 		//CellList nextCreatures = creatures.update();
 		//creatures = nextCreatures;
+		creatures.update();
 		
-		//gameBoard.update();
+		gameBoard.update();
 		
 		// TODO add creatures.equals checking
 		return creatures.size() > 0;

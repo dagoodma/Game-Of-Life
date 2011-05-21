@@ -9,8 +9,14 @@ import java.util.ListIterator;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 
+/**
+ * 
+ * @author <a href="mailto:dagoodma@ucsc.edu">David Goodman</a>
+ *
+ */
 public class CellList implements Iterable<Cell> {
-	private int count, modCount; // count the elements and modifications
+	protected int count; // count the elements and modifications
+	protected int modCount;
 	private Cell head, tail;
 	/**
 	 * The CellList is similar to a linked list, but with various extra
