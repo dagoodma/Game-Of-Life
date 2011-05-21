@@ -8,60 +8,21 @@ can run the application by visiting: http://m4l3.com/life
 
 h2. Implementation
 
-This game of life is based off Conway's Game of Life. More information
-can be found here: http://en.wikipedia.org/wiki/Conway's_Game_of_Life
-For a very interesting perspective read: @http://m4l3.com/life.pdf@
-
-    This release is to meet the specifications for program 3, which is
-an assignment for a computer science class at UC, Santa Cruz. Currently,
-the features that are available in this version, @v1.520@, include an
-O(n) game updating algorithm, drawing tiles by clicking, as well as
-drawing tiles by clicking and dragging, play/pause button, reset/clear
-button, speed selection drop down menu, and a preset selection drop
-down menu. These are the same features available in the last version,
-v1.505, except that the data structure that embodies the game has been
-changed from a linked list to a hash table.
+This game of life is based off Conway's Game of Life. More information can be found here: http://en.wikipedia.org/wiki/Conway's_Game_of_Life. For a very interesting perspective read: http://m4l3.com/life.pdf. This release is to meet the specifications for program 3, which is an assignment for a computer science class at UC, Santa Cruz. Currently, the features that are available in this version, @v1.520@, include an O(n) game updating algorithm, drawing tiles by clicking, as well as drawing tiles by clicking and dragging, play/pause button, reset/clear button, speed selection drop down menu, and a preset selection drop down menu. These are the same features available in the last version, v1.505, except that the data structure that embodies the game has been changed from a linked list to a hash table.
 
 
 h3. Hash Table
 
-    At the heart of this implementation is the CellHash: @src/com/
-cmps101/client/CellHash.java@, which represents a hash table that has
-been written to handle Cells in the game. The most notable features
-of the CellHash are: a verifier linked list to keep a reference to all
-of the n elements contained in the hash, an update() function that
-determines each subsequent turn by applying the rules of life, and a
-setList() function for loading a preset configuration of cells into the
-hash. Other minor differences include a deleteAt() function for deleting
-a cell at the given coordinate location and an iterator() function to
-allow for using a CellHash in a foreach-style loop.
+    At the heart of this implementation is the CellHash: @src/com/cmps101/client/CellHash.java@, which represents a hash table that has been written to handle Cells in the game. The most notable features of the CellHash are: a verifier linked list to keep a reference to all of the n elements contained in the hash, an update() function that determines each subsequent turn by applying the rules of life, and a setList() function for loading a preset configuration of cells into the hash. Other minor differences include a deleteAt() function for deleting a cell at the given coordinate location and an iterator() function to allow for using a CellHash in a foreach-style loop.
 
 
 h3. Update Method
 
-    The entry point can be found in the GameOfLife class: @src/com/
-cmps101/client/GameOfLife.java@, where the state of the game is contained
-in a CellHash called creatures. When the game is to be advanced to the
-next turn, creatures is updated by calling creatures.update(). The
-update() method first checks the 8 neighboring tiles of each live cell.
-If the tile contains nothing then a dead neighbor cell is placed there
-with a neighbor count of 1. If the tile already has a dead neighbor
-cell then that neighbor cell's neighbor count is incremented. The last
-possibility, the tile contains a live cell, then only the original
-liveCell that we are checking the neighboring tiles of would have its
-neighbor count incremented. This task will complete in O(n) time, which
-comes from @O(9 * (1 + k/n) * n)@, where k = 128 (number of rows in the
-hash table), and n = # of elements in the hash table. After handling the
-neighboring tiles, once the neighbor count for each cell has been
-calculated a final pass is then made to apply the rules of the Game of
-Life by calling each cell's nextState() function, deleting it if it is
-dead, and clearing its neighbor count for the next turn. This task takes
-O(n) time because each operation within is O(1) and we are iterating
-over all of the b*n cells on the board, where @1 >= b <= 8@. These two
-tasks together make up an O(n) update() method.
+    The entry point can be found in the GameOfLife class: @src/com/cmps101/client/GameOfLife.java@, where the state of the game is contained in a CellHash called creatures. When the game is to be advanced to the next turn, creatures is updated by calling creatures.update(). The update() method first checks the 8 neighboring tiles of each live cell. If the tile contains nothing then a dead neighbor cell is placed there with a neighbor count of 1. If the tile already has a dead neighbor cell then that neighbor cell's neighbor count is incremented. The last possibility, the tile contains a live cell, then only the original liveCell that we are checking the neighboring tiles of would have its neighbor count incremented. This task will complete in O(n) time, which comes from @O(9 * (1 + k/n) * n)@, where k = 128 (number of rows in the hash table), and n = # of elements in the hash table. After handling the neighboring tiles, once the neighbor count for each cell has been calculated a final pass is then made to apply the rules of the Game of Life by calling each cell's nextState() function, deleting it if it is dead, and clearing its neighbor count for the next turn. This task takes O(n) time because each operation within is O(1) and we are iterating over all of the b*n cells on the board, where @1 >= b <= 8@. These two tasks together make up an O(n) update() method.
 
 
-h2. Background (GWT specifics)
+h2. Background 
+h3. Google Web Toolkit
 
 As mentioned above, this program is a Google Web Toolkit application.
 The included source code is not meant to be compiled by the grader,
@@ -71,67 +32,15 @@ Basically, applications are written in Java and then cross-compiled
 into javascript to be run on any browser without need for a Java
 Runtime Environment (JRE).
 
-    The directory containing all of the source code is:
-@src/com/cmps101/client/@. The GameOfLife class contains the 
-onModuleLoad() function, which is defined as the entry point for the
-GWT application. This file houses some of the game's logic such
-as the RepeatingCommand used to update the game at a specified rate
-as well as the controls for manipulating the state of the game--which 
-are defined in the GameBoard class (GameBoard.java), which makes up
-the user inteface. This class's job is simplified by a GWT concept
-called the UiBinder. As GWT applications are composed of Widgets, the
-UiBinder file is an xml file that specifies the layout for a partic-
-ular widget. Our layout is defined in GameBoard.ui.xml, where panels
-and widgets that make up the web content are to be defined, and if
-desired, their respective CSS styles be set. The GameBoard Widget is
-then simplified in by various GWT annotations such as: @UiTemplate,
-@UiField, and @UiHanlder. These annotations do a good portion of
-dirty work by allowing the GWT compiler to substitute the necessary
-code in their place.
+    The directory containing all of the source code is: @src/com/cmps101/client/@. The GameOfLife class contains the onModuleLoad() function, which is defined as the entry point for the GWT application. This file houses some of the game's logic such as the RepeatingCommand used to update the game at a specified rate as well as the controls for manipulating the state of the game--which are defined in the GameBoard class (GameBoard.java), which makes up the user inteface. This class's job is simplified by a GWT concept called the UiBinder. As GWT applications are composed of Widgets, the UiBinder file is an xml file that specifies the layout for a particular widget. Our layout is defined in GameBoard.ui.xml, where panels and widgets that make up the web content are to be defined, and if desired, their respective CSS styles be set. The GameBoard Widget is then simplified in by various GWT annotations such as: @UiTemplate, @UiField, and @UiHanlder. These annotations do a good portion of dirty work by allowing the GWT compiler to substitute the necessary code in their place.
 
-    Lastly I should mention the file GameResources.java. This interface
-is just a hook for the CSS file Life.css and extends the ClientBundle.
-If this game had any sounds or graphics they would be specified here
-for use by the GameBoard widget. In this case, all that can be seen in
-the GameResources class is a CssResource called GameCss and its accessor
-method GameResources.css(). In GWT all CSS classes are obfuscated with
-the rest of the code so that all of their names become random Strings.
-Because of this feature methods are needed to retrieve these obfuscated
-class names. In this way the class names can be scrambled and replaced
-while the code is still able to reference them at runtime.
+    Lastly I should mention the file GameResources.java. This interface is just a hook for the CSS file Life.css and extends the ClientBundle. If this game had any sounds or graphics they would be specified here for use by the GameBoard widget. In this case, all that can be seen in the GameResources class is a CssResource called GameCss and its accessor method GameResources.css(). In GWT all CSS classes are obfuscated with the rest of the code so that all of their names become random Strings. Because of this feature methods are needed to retrieve these obfuscated class names. In this way the class names can be scrambled and replaced while the code is still able to reference them at runtime.
 
 
 h2. Results
 
-When I first began creating the game of life I constructed a version
-that updated in Θ(n^2) time. While the drawbacks were not apparent
-at first, it soon became obvious (when enough cells were alive in the
-game) that my algorithm was inefficient. At a normal game pace, the
-game would consume 20% cpu resources with enough creatures on the
-screen. Then, when I increased the game pace to fastest I saw the cpu
-usage jump to 50% and the game would crawl along. Such a delay
-became noticeable that I made improvement of the game's update
-algorithm my main goal. Eventually, I was able to write an O(n) update()
-function by writing the CellList class to handle the pointers directly
-instead of extending the LinkedList class as I had done for the O(n^2)
-implementation. This triumph was realized for v1.505, but this was all
-recently re-worked for @v1.520@ (program 3).
+When I first began creating the game of life I constructed a version that updated in Θ(n^2) time. While the drawbacks were not apparent at first, it soon became obvious (when enough cells were alive in the game) that my algorithm was inefficient. At a normal game pace, the game would consume 20% cpu resources with enough creatures on the screen. Then, when I increased the game pace to fastest I saw the cpu usage jump to 50% and the game would crawl along. Such a delay became noticeable that I made improvement of the game's update algorithm my main goal. Eventually, I was able to write an O(n) update() function by writing the CellList class to handle the pointers directly instead of extending the LinkedList class as I had done for the O(n^2) implementation. This triumph was realized for v1.505, but this was all recently re-worked for @v1.520@ (program 3).
 
-    In @v1.520@ the update() function has been greatly simplified through the
-transition to the hash table data structure instead of the linked list.
-After testing both implementations it has occured to me that the hash
-map implementation seems to require much less cpu usage to accomplish
-the same task as the linked list. However, after faster speed the hash
-map appears to become a bottle neck and the cpu usage climbs to 50%.
-Also, please note that I was not afforded enough time to finish a
-rehashing feature and to experiment with different hash functions. It
-seems that while v1.505 was able to run at the fastest speed with much
-less effort using only 15% cpu--even while processing hundreds and
-hundreds of cells every 5/1000ths of a second, the hash map in @v1.520@
-falls far behind at 50% cpu. The most interesting part about this is
-that the hash map did quite well at the normal speed settings
-refreshing every 175/1000ths, 7/40, of a second by only using 4% cpu. I
-would interested in knowing how well v1.505 performed at the same
-speed.
+    In @v1.520@ the update() function has been greatly simplified through the transition to the hash table data structure instead of the linked list. After testing both implementations it has occured to me that the hash map implementation seems to require much less cpu usage to accomplish the same task as the linked list. However, after faster speed the hash map appears to become a bottle neck and the cpu usage climbs to 50%. Also, please note that I was not afforded enough time to finish a rehashing feature and to experiment with different hash functions. It seems that while v1.505 was able to run at the fastest speed with much less effort using only 15% cpu--even while processing hundreds and hundreds of cells every 5/1000ths of a second, the hash map in @v1.520@ falls far behind at 50% cpu. The most interesting part about this is that the hash map did quite well at the normal speed settings refreshing every 175/1000ths, 7/40, of a second by only using 4% cpu. I would interested in knowing how well v1.505 performed at the same speed.
 
 *NOTE:* Please see the code for more information. Many comments have been added.
